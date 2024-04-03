@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = [] // You won't need this in Prisma 3.X or higher.
+}
+
+enum Roles {
+  ADMIN
+  USER
+}
+
+enum USER_ROLES {
+  SUPERADMIN
+  ADMIN
+  USER
+}
+
+enum POSITIONS {
+  DOSEN
+  STAFF
+  SATPAM
+}
+
+enum KAMPUS {
+  Karangmalang
+  JlKenari
+  JlBantul
+  Wates
+  GunungKidul
+}
+
+model Users {
+  id       String     @id @default(cuid())
+  name     String
+  password String
+  nip      String
+  kampus   KAMPUS
+  role     USER_ROLES
+  position POSITIONS
+  gender   String
+  unit     String?
+  subunit  String?
+  Report   Report[]
+
+  @@map("user")
+}
+
+model Descriptors {
+  id          Int    @id @default(autoincrement())
+  label       String
+  descriptors Json
+
+  @@map("descriptors")
+}
+
+model Report {
+  id       Int      @id @default(autoincrement())
+  datang   DateTime
+  pulang   DateTime
+  ekspresi String
+  user     Users    @relation(fields: [userId], references: [id])
+  userId   String
+
+  @@map("report")
+}
