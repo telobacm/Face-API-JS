@@ -10,11 +10,6 @@ generator client {
   previewFeatures = [] // You won't need this in Prisma 3.X or higher.
 }
 
-enum Roles {
-  ADMIN
-  USER
-}
-
 enum USER_ROLES {
   SUPERADMIN
   ADMIN
@@ -27,45 +22,48 @@ enum POSITIONS {
   SATPAM
 }
 
-enum KAMPUS {
-  Karangmalang
-  JlKenari
-  JlBantul
-  Wates
-  GunungKidul
+enum ENTER_EXIT {
+  Masuk
+  Pulang
 }
 
 model Users {
-  id       String     @id @default(cuid())
-  name     String
-  password String
-  nip      String
-  kampus   KAMPUS
-  role     USER_ROLES
-  position POSITIONS
-  gender   String
-  unit     String?
-  subunit  String?
-  Report   Report[]
-
-  @@map("user")
-}
-
-model Descriptors {
-  id          Int    @id @default(autoincrement())
-  label       String
+  id          String     @id @unique @default(cuid())
+  name        String
+  password    String
+  nip         String     @unique
+  email       String     @unique
+  kampus      String
+  role        USER_ROLES
+  position    POSITIONS
+  gender      String
+  unit        String?
+  subunit     String?
   descriptors Json
+  Reports     Reports[]
 
-  @@map("descriptors")
+  @@map("users")
 }
 
-model Report {
-  id       Int      @id @default(autoincrement())
-  datang   DateTime
-  pulang   DateTime
-  ekspresi String
-  user     Users    @relation(fields: [userId], references: [id])
-  userId   String
+model Reports {
+  id          Int        @id @unique @default(autoincrement())
+  timestamp   DateTime   @default(now())
+  ekspresi    String
+  enterExit   ENTER_EXIT
+  isPunctual  String?
+  shiftSatpam String?
+  userId      String
+  image       String?
+  user        Users      @relation(fields: [userId], references: [id])
 
-  @@map("report")
+  @@map("reports")
+}
+
+model Devices {
+  id     String @id @unique @default(cuid())
+  kampus String
+  unit   String
+  mac    String
+
+  @@map("devices")
 }

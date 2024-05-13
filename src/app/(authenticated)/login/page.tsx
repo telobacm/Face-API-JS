@@ -8,6 +8,7 @@ import { BiLock, BiMailSend, BiLogoGoogle } from 'react-icons/bi'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import AdminLayout from '~/app/(authenticated)/components/layoutAdmin'
+import { AiOutlineNumber } from 'react-icons/ai'
 
 const Login = ({ session }: any) => {
   const router = useRouter()
@@ -15,7 +16,7 @@ const Login = ({ session }: any) => {
   const role = data?.user?.role
   useEffect(() => {
     if (status == 'authenticated') {
-      router.push(role === 'USER' ? 'dashboard/settings' : 'dashboard')
+      router.push('reports')
     }
   }, [status, router, role])
 
@@ -40,7 +41,7 @@ const Login = ({ session }: any) => {
 
       if (res?.error == null) {
         toast.success('Success!')
-        router.push('/dashboard')
+        router.push('/reports')
       } else {
         toast.error('Incorrect Email or Password!')
       }
@@ -48,6 +49,39 @@ const Login = ({ session }: any) => {
       console.error(error)
     }
   }
+
+  {
+    /* with nip, still fail */
+  }
+  // const handleSubmit = async (e: any) => {
+  //   try {
+  //     e.preventDefault()
+  //     const nip = e.target.nip.value
+  //     const password = e.target.password.value
+  //     if (nip === '') return toast.error('NIP tidak boleh kosong!')
+  //     if (password === '') return toast.error('Password tidak boleh kosong!')
+
+  //     // if (password.length < 6) {
+  //     //   toast.error('Password must be at least 6 characters long')
+  //     //   return
+  //     // }
+
+  //     const res = await signIn('credentials', {
+  //       nip,
+  //       password,
+  //       redirect: false,
+  //     })
+
+  //     if (res?.error == null) {
+  //       toast.success('Success!')
+  //       router.push('/reports')
+  //     } else {
+  //       toast.error('Incorrect NIP or Password!')
+  //     }
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
 
   return (
     <SessionProvider session={session}>
@@ -61,6 +95,23 @@ const Login = ({ session }: any) => {
                     Sign In
                   </h2>
                   <form onSubmit={handleSubmit}>
+                    {/* with nip, still fail */}
+                    {/* <div className="mb-4">
+                      <label className="mb-2.5 block font-medium text-black dark:text-white">
+                        NIP
+                      </label>
+                      <div className="relative">
+                        <input
+                          name="nip"
+                          type="text"
+                          placeholder="Masukkan NIP Anda"
+                          className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                        />
+                        <span className="absolute right-4 top-4">
+                          <AiOutlineNumber className="text-2xl opacity-50" />
+                        </span>
+                      </div>
+                    </div> */}
                     <div className="mb-4">
                       <label className="mb-2.5 block font-medium text-black dark:text-white">
                         Email
@@ -85,7 +136,7 @@ const Login = ({ session }: any) => {
                         <input
                           name="password"
                           type="password"
-                          placeholder="6+ Characters, 1 Capital letter"
+                          placeholder="Masukkan password"
                           className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                         />
                         <span className="absolute right-4 top-4">
@@ -97,22 +148,8 @@ const Login = ({ session }: any) => {
                       <input
                         type="submit"
                         className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
-                        value="Sign In"
+                        value="Log In"
                       />
-                    </div>
-                    {/* <div className="cursor-pointer flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
-                      <span>
-                        <BiLogoGoogle className="text-2xl opacity-50" />
-                      </span>
-                      Sign in with Google
-                    </div> */}
-                    <div className="mt-6 text-center">
-                      <div>
-                        Don&apos;t have any account?
-                        <Link href="/register" className="text-slate-400 pl-2">
-                          Register
-                        </Link>
-                      </div>
                     </div>
                   </form>
                 </div>

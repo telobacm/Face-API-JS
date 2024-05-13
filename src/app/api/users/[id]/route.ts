@@ -1,23 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { REMOVE, UPDATE } from '~/app/api/crud'
-import { prisma } from '~/../prisma/client'
-import { HandleError } from '~/helpers/server'
+import { DETAIL, REMOVE, UPDATE } from '~/app/api/crud'
 
 export const PATCH = UPDATE
 export const DELETE = REMOVE
 
-export const GET = async (req: NextRequest, { params }: any) => {
-  try {
-    const detail = await prisma.user.findFirstOrThrow({
-      where: {
-        id: params.id.toString(),
-      },
-    })
-
-    delete detail.password
-
-    return NextResponse.json(detail)
-  } catch (error: any) {
-    return HandleError(error)
-  }
+export const GET = (req: NextRequest, { params }: any) => {
+  return DETAIL(req, { params, where: { id: params.id } })
 }

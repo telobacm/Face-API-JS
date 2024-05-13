@@ -7,7 +7,7 @@ export const PATCH = async (req: NextRequest, { params }: any) => {
     const data = await req.json()
     const { oldPassword, newPassword, confirmNewPassword } = data
 
-    const user = await prisma.user.findUnique({ where: { id: params.id } })
+    const user = await prisma.users.findUnique({ where: { id: params.id } })
     if (!user) {
       return NextResponse.json(
         { message: 'User tidak ditemukan' },
@@ -30,7 +30,7 @@ export const PATCH = async (req: NextRequest, { params }: any) => {
         { status: 401 },
       )
     }
-    const updated = await prisma.user.update({
+    const updated = await prisma.users.update({
       where: { id: params.id },
       data: { password: newPassword },
     })

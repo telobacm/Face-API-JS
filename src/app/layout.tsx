@@ -29,7 +29,6 @@ export default function RootLayout({ children, session }: any) {
     <html lang="en" className={inter.className}>
       <head>
         <link rel="icon" href="/title-logo.svg" type="image/png" sizes="any" />
-        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
       </head>
       <body>
         <SessionProvider session={session}>
@@ -37,8 +36,6 @@ export default function RootLayout({ children, session }: any) {
             <Hydrate>{children}</Hydrate>
           </QueryClientProvider>
         </SessionProvider>
-        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-        <script>AOS.init();</script>
       </body>
     </html>
   )

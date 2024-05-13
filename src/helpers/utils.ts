@@ -1,3 +1,25 @@
+export function calculateEAR(eyeLandmarks: any) {
+  // Hitung jarak Euclidean antara dua set landmark mata vertikal
+  const A = Math.sqrt(
+    Math.pow(eyeLandmarks[1].x - eyeLandmarks[5].x, 2) +
+      Math.pow(eyeLandmarks[1].y - eyeLandmarks[5].y, 2),
+  )
+  const B = Math.sqrt(
+    Math.pow(eyeLandmarks[2].x - eyeLandmarks[4].x, 2) +
+      Math.pow(eyeLandmarks[2].y - eyeLandmarks[4].y, 2),
+  )
+
+  // Hitung jarak Euclidean antara landmark mata horizontal
+  const C = Math.sqrt(
+    Math.pow(eyeLandmarks[0].x - eyeLandmarks[3].x, 2) +
+      Math.pow(eyeLandmarks[0].y - eyeLandmarks[3].y, 2),
+  )
+
+  // Hitung Rasio Aspek Mata (EAR)
+  const ear = (A + B) / (2 * C)
+  return ear
+}
+
 export function groupDataByPageAndSection(data: any) {
   const groupedData = []
   const tempData: any = {}

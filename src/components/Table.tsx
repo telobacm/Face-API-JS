@@ -1,5 +1,5 @@
-"use client";
-import React, { useMemo, useRef, useState } from "react";
+'use client'
+import React, { useMemo, useRef, useState } from 'react'
 import {
   useReactTable,
   flexRender,
@@ -7,9 +7,10 @@ import {
   getSortedRowModel,
   createColumnHelper,
   getPaginationRowModel,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table'
 // import { IoChevronDown } from 'react-icons/io5';
-import debounce from "debounce";
+import debounce from 'debounce'
+import NotFoundComponent from './NotFound'
 
 const Table = ({
   searchValueProps,
@@ -20,13 +21,14 @@ const Table = ({
   // handleDelete,
   finalColumnDef,
   // columnDefWithCheckBox,
+  showNotFound,
   data,
   title,
 }: any) => {
-  const [searchValue, setSearchValue] = searchValueProps;
-  const [currentPage, setCurrentPage] = currentPageProps;
-  const [rowSelection, setRowSelection] = useState({});
-  const [sorting, setSorting]: any = useState([]);
+  const [searchValue, setSearchValue] = searchValueProps
+  const [currentPage, setCurrentPage] = currentPageProps
+  const [rowSelection, setRowSelection] = useState({})
+  const [sorting, setSorting]: any = useState([])
 
   // const finalColumnDef: any = columnDefWithCheckBox(handleEdit, handleDelete);
 
@@ -44,18 +46,18 @@ const Table = ({
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
     enableRowSelection: true,
-  });
+  })
 
   return (
     <>
       <div
         className={`flex ${
-          optionLanguage ? "items-end" : ""
+          optionLanguage ? 'items-end' : ''
         } w-full gap-5 justify-between mt-5`}
       >
         <div
           className={`w-1/2 ${
-            optionLanguage ? "flex items-end gap-2" : "md:w-1/4"
+            optionLanguage ? 'flex items-end gap-2' : 'md:w-1/4'
           }`}
         >
           <input
@@ -94,18 +96,18 @@ const Table = ({
                               ? null
                               : flexRender(
                                   columnEl.column.columnDef.header,
-                                  columnEl.getContext()
+                                  columnEl.getContext(),
                                 )}
-                            {columnEl.column.getIsSorted() === "asc"
-                              ? "↑"
-                              : columnEl.column.getIsSorted() === "desc"
-                                ? "↓"
+                            {columnEl.column.getIsSorted() === 'asc'
+                              ? '↑'
+                              : columnEl.column.getIsSorted() === 'desc'
+                                ? '↓'
                                 : null}
                           </th>
-                        );
+                        )
                       })}
                     </tr>
-                  );
+                  )
                 })}
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -117,13 +119,13 @@ const Table = ({
                           <td key={cellEl.id} className="text-gray-900 p-4">
                             {flexRender(
                               cellEl.column.columnDef.cell,
-                              cellEl.getContext()
+                              cellEl.getContext(),
                             )}
                           </td>
-                        );
+                        )
                       })}
                     </tr>
-                  );
+                  )
                 })}
               </tbody>
             </table>
@@ -136,9 +138,15 @@ const Table = ({
           />
         </div>
       )}
+      {showNotFound && (
+        <NotFoundComponent
+          message={`Data ${title} Tidak Ditemukan`}
+          className="p-7"
+        />
+      )}
     </>
-  );
-};
+  )
+}
 
 const TableFooter = ({
   totalPages,
@@ -147,13 +155,13 @@ const TableFooter = ({
   setCurrentPage,
 }: any) => {
   const handleChangePage = (page: number) => {
-    setCurrentPage(page);
-  };
+    setCurrentPage(page)
+  }
 
   const handleNavigatePage = (type: string) => {
-    let page = type == "prev" ? currentPage - 1 : currentPage + 1;
-    setCurrentPage(page);
-  };
+    let page = type == 'prev' ? currentPage - 1 : currentPage + 1
+    setCurrentPage(page)
+  }
 
   return (
     <nav
@@ -172,7 +180,7 @@ const TableFooter = ({
         <li>
           <button
             disabled={currentPage == 1}
-            onClick={() => handleNavigatePage("prev")}
+            onClick={() => handleNavigatePage('prev')}
             className="disabled:cursor-not-allowed flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 "
           >
             <span className="sr-only">Previous</span>
@@ -188,8 +196,8 @@ const TableFooter = ({
               type="button"
               className={`flex items-center justify-center text-sm py-2 px-3 leading-tight ${
                 currentPage === index + 1
-                  ? "bg-blue-700 text-white"
-                  : "bg-white text-gray-500"
+                  ? 'bg-blue-700 text-white'
+                  : 'bg-white text-gray-500'
               } border border-gray-300 hover:bg-gray-100 hover:text-gray-700 `}
             >
               {index + 1}
@@ -200,7 +208,7 @@ const TableFooter = ({
         <li>
           <button
             disabled={currentPage == totalPages}
-            onClick={() => handleNavigatePage("next")}
+            onClick={() => handleNavigatePage('next')}
             className="disabled:cursor-not-allowed flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 "
           >
             <span className="sr-only">Next</span>
@@ -210,7 +218,7 @@ const TableFooter = ({
         </li>
       </ul>
     </nav>
-  );
-};
+  )
+}
 
-export default Table;
+export default Table

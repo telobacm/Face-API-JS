@@ -9,13 +9,8 @@ import { useSession } from 'next-auth/react'
 import NotFound from '~/app/not-found'
 import { usePathname } from 'next/navigation'
 
-const blacklist = [
-  '/dashboard/program',
-  '/dashboard/media',
-  '/dashboard/comment',
-  '/dashboard/team',
-  '/dashboard/social',
-]
+const blacklist = ['/users', '/devices']
+const blacklistAdminUnit = ['/devices']
 
 export default function AdminLayout({
   children,
@@ -27,8 +22,11 @@ export default function AdminLayout({
 
   const session: any = useSession()
   const role = session?.data?.user?.role
+  console.log('role', role)
 
   return blacklist.includes(pathname) && role === 'USER' ? (
+    <NotFound />
+  ) : blacklistAdminUnit.includes(pathname) && role === 'ADMIN' ? (
     <NotFound />
   ) : (
     <div className="dark:bg-boxdark-2 dark:text-bodydark">

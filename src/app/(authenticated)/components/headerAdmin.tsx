@@ -9,14 +9,17 @@ export default function HeaderAdmin(props: {
 }) {
   const { data: session }: any = useSession()
   const role = useMemo(() => {
-    if (session?.user?.role == 'ADMIN') {
-      return 'Administrator'
+    if (session?.user?.role == 'SUPERADMIN') {
+      return 'Super Admin'
+    } else if (session?.user?.role == 'ADMIN') {
+      return 'Admin Unit'
     } else if (session?.user?.role == 'USER') {
       return 'User'
     } else {
       return 'Unknown'
     }
   }, [session])
+
   return (
     <header className="sticky top-0 z-50 flex w-full bg-primary md:bg-white drop-shadow-1 drop-shadow ">
       <div className="flex flex-grow items-center justify-between py-4 px-4 shadow-2 md:px-6 2xl:px-11">
@@ -29,7 +32,7 @@ export default function HeaderAdmin(props: {
             }}
             className="block lg:hidden"
           >
-            <BiMenuAltLeft className="text-2xl text-white md:text-primary" />
+            <BiMenuAltLeft className="text-2xl text-white md:text-black" />
           </button>
 
           <Link className="block flex-shrink-0 lg:hidden" href="/">
@@ -38,13 +41,27 @@ export default function HeaderAdmin(props: {
             </div>
           </Link>
         </div>
-        <div className="flex justify-end w-full items-center gap-3 2xsm:gap-7">
+        <div className="flex justify-end gap-6 w-full items-end 2xsm:gap-7">
           <div className="flex items-center gap-4">
-            <div className="flex flex-col dark:text-white text-white md:text-black">
+            <div className="flex flex-col text-white md:text-black">
               <div>{session?.user?.name || session?.user?.email}</div>
-              <div className="text-xs text-gray-500">{role}</div>
+              <div className="text-sm text-gray-500">{role}</div>
             </div>
           </div>
+          {role === 'Admin Unit' && (
+            <div className="flex items-center gap-4">
+              <div className="flex flex-col text-sm text-white md:text-black">
+                <div>
+                  Kampus:{' '}
+                  <span className="font-semibold">{session?.user?.kampus}</span>
+                </div>
+                <div>
+                  Unit:{' '}
+                  <span className="font-semibold">{session?.user?.unit}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>

@@ -16,9 +16,17 @@ import {
   subUnitStaff,
   units,
 } from '~/helpers/constant'
+import { useSession } from 'next-auth/react'
 
 const Register = ({ session }: any) => {
   const router = useRouter()
+  const { status, data: sessionData }: any = useSession()
+  const role = sessionData?.user?.role
+  useEffect(() => {
+    if (status === 'unauthenticated') router.push('/login')
+    if (status === 'authenticated' && role == 'USER') router.push('/reports')
+  }, [status, router, role])
+
   const { mutateAsync: registerUser, error: errorRegisterUser }: any =
     usePost('users')
   const { mutateAsync: recordFace, error: errorRecordFace }: any =
@@ -54,30 +62,51 @@ const Register = ({ session }: any) => {
   const handleSubmit = async (e: any) => {
     try {
       e.preventDefault()
-      const { fullname, nip, kampus, gender, password, confirm_password } =
-        e.target
+      const {
+        fullname,
+        nip,
+        email,
+        kampus,
+        gender,
+        password,
+        confirm_password,
+      } = e.target
       const payloadUser: any = {
         name: fullname.value,
         nip: nip.value,
-        kampus: kampus.value,
+        email: email.value,
         position: position,
         gender: gender.value,
         password: password.value,
         confirm_password: confirm_password.value,
         role: 'USER',
+        descriptors: faceDescriptors,
       }
+
+      if (role === 'SUPERADMIN') {
+        payloadUser.kampus = kampus.value
+      } else if (role === 'ADMIN') {
+        payloadUser.kampus = sessionData?.user?.kampus
+      }
+
       if (position !== 'SATPAM') {
-        payloadUser.unit = unit
+        if (role === 'SUPERADMIN') {
+          payloadUser.unit = unit
+        } else if (role === 'ADMIN') {
+          payloadUser.unit = sessionData?.user?.unit
+        }
+      } else {
+        payloadUser.unit = 'Satpam'
       }
 
       if (position !== 'SATPAM' && !unit.includes('Direktorat')) {
-        payloadUser.subunit = subUnit
+        if (role === 'SUPERADMIN') {
+          payloadUser.subunit = subUnit
+        } else if (role === 'ADMIN') {
+          payloadUser.subunit = sessionData?.user?.unit
+        }
       }
 
-      const payloadFace: any = {
-        label: `${fullname.value} / ${nip.value}`,
-        descriptors: faceDescriptors,
-      }
       if (password.length < 6) {
         toast.error('Password minimal 6 karakter!')
         return
@@ -91,9 +120,7 @@ const Register = ({ session }: any) => {
         return
       }
 
-      console.log(payloadUser)
       await registerUser(payloadUser)
-      await recordFace(payloadFace)
       router.push('/users')
     } catch (error) {
       console.log(error)
@@ -113,7 +140,8 @@ const Register = ({ session }: any) => {
   }, [errorRecordFace])
 
   return (
-    <AdminLayout sidebar={false} header={false}>
+    // status == 'authenticated' && (
+    <AdminLayout sidebar={true} header={true}>
       <div className="">
         <form
           onSubmit={handleSubmit}
@@ -156,29 +184,16 @@ const Register = ({ session }: any) => {
                   </div>
                   <div>
                     <label className="mb-1 mt-3 block font-medium text-black">
-                      Kampus
+                      Email
                     </label>
                     <div className="relative">
-                      <select
+                      <input
                         required
-                        name="kampus"
+                        name="email"
+                        type="email"
+                        placeholder="Enter your Email"
                         className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                      >
-                        <option
-                          value=""
-                          disabled
-                          selected
-                          hidden
-                          className="text-gray-400"
-                        >
-                          Pilih Kampus
-                        </option>
-                        {kampus.map((option, index) => (
-                          <option key={index} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
+                      />
                     </div>
                   </div>
                   <div>
@@ -209,35 +224,68 @@ const Register = ({ session }: any) => {
                       </select>
                     </div>
                   </div>
-                  {position !== 'SATPAM' && (
-                    <div>
-                      <label className="mb-1 mt-3 block font-medium text-black">
-                        Unit
-                      </label>
-                      <div className="relative">
-                        <select
-                          required
-                          name="unit"
-                          onChange={(e) => setUnit(e.target.value)}
-                          className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                        >
-                          <option
-                            value=""
-                            disabled
-                            selected
-                            hidden
-                            className="text-gray-400"
+                  {role === 'SUPERADMIN' ? (
+                    <>
+                      <div>
+                        <label className="mb-1 mt-3 block font-medium text-black">
+                          Kampus
+                        </label>
+                        <div className="relative">
+                          <select
+                            required
+                            name="kampus"
+                            className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                           >
-                            Pilih Unit
-                          </option>
-                          {units.map((option, index) => (
-                            <option key={index} value={option.value}>
-                              {option.label}
+                            <option
+                              value=""
+                              disabled
+                              selected
+                              hidden
+                              className="text-gray-400"
+                            >
+                              Pilih Kampus
                             </option>
-                          ))}
-                        </select>
+                            {kampus.map((option, index) => (
+                              <option key={index} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
-                    </div>
+                      {position !== 'SATPAM' && (
+                        <div>
+                          <label className="mb-1 mt-3 block font-medium text-black">
+                            Unit
+                          </label>
+                          <div className="relative">
+                            <select
+                              required
+                              name="unit"
+                              onChange={(e) => setUnit(e.target.value)}
+                              className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                            >
+                              <option
+                                value=""
+                                disabled
+                                selected
+                                hidden
+                                className="text-gray-400"
+                              >
+                                Pilih Unit
+                              </option>
+                              {units.map((option, index) => (
+                                <option key={index} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    ''
                   )}
                   {position !== 'SATPAM' && !unit.includes('Direktorat') && (
                     <div>
@@ -337,6 +385,7 @@ const Register = ({ session }: any) => {
       </div>
     </AdminLayout>
   )
+  // )
 }
 
 function PasswordInput({

@@ -1,9 +1,9 @@
 export const kampus = [
   { label: 'Karangmalang', value: 'Karangmalang' },
-  { label: 'Jl Kenari', value: 'JlKenari' },
-  { label: 'Jl Bantul', value: 'JlBantul' },
+  { label: 'Jl Kenari', value: 'Jl Kenari' },
+  { label: 'Jl Bantul', value: 'Jl Bantul' },
   { label: 'Wates', value: 'Wates' },
-  { label: 'Gunung Kidul', value: 'GunungKidul' },
+  { label: 'Gunung Kidul', value: 'Gunung Kidul' },
 ]
 export const positions = [
   { label: 'Staff', value: 'STAFF' },

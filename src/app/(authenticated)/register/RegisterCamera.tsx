@@ -1,10 +1,4 @@
-import React, {
-  useRef,
-  useEffect,
-  useState,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import * as faceapi from 'face-api.js'
 import { toast } from 'react-toastify'
 
@@ -14,6 +8,7 @@ const RegisterCamera = ({ faceDescriptors, setFaceDescriptors }: any) => {
   const [counter, setCounter] = useState<number>(5)
   const webcamRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [enableTakePhoto, setEnableTakePhoto] = useState(false)
 
   useEffect(() => {
     const setupFaceRecognition = async () => {
@@ -100,6 +95,7 @@ const RegisterCamera = ({ faceDescriptors, setFaceDescriptors }: any) => {
           .withFaceDescriptor()
 
         if (detections) {
+          setEnableTakePhoto(true)
           const resizedDetections = faceapi.resizeResults(detections, {
             width: 640,
             height: 480,
@@ -156,9 +152,9 @@ const RegisterCamera = ({ faceDescriptors, setFaceDescriptors }: any) => {
     }
   }
 
-  const submitData = () => {
-    console.log('submitting data:', faceDescriptors)
-  }
+  // const submitData = () => {
+  //   console.log('submitting data:', faceDescriptors)
+  // }
 
   return (
     <div className="flex flex-col gap-4 justify-between items-center p-8 h-5/6 relative">
@@ -176,8 +172,9 @@ const RegisterCamera = ({ faceDescriptors, setFaceDescriptors }: any) => {
             </div>
             <button
               type="button"
-              className="bg-emerald-700 text-white font-bold py-2 px-4 mx-auto rounded"
+              className="bg-emerald-700 disabled:bg-gray-700 text-white font-bold py-2 px-4 mx-auto rounded"
               onClick={takePhoto}
+              disabled={enableTakePhoto === false}
             >
               Take Photo
             </button>

@@ -5,6 +5,24 @@ import { prisma } from '~/../prisma/client'
 import { unlink } from 'fs/promises'
 import { getFileName } from './utils'
 
+interface SearchFilter {
+  search: string
+  search_keys: string
+}
+
+interface ContainsFilter {
+  contains: string
+  mode: 'insensitive'
+}
+
+interface KeyObject {
+  [key: string]: KeyObject | ContainsFilter
+}
+
+interface QueryFilterResult {
+  OR?: KeyObject[]
+}
+
 const isDev = process.env.NODE_ENV == 'development'
 export const headers = { 'Content-Type': 'application/json' }
 
@@ -91,33 +109,55 @@ const validate = (value: any) => {
   return value
 }
 
-const handleQuerySearch = async (queryFilter: any, table: any) => {
+const handleQuerySearch = (queryFilter: SearchFilter): QueryFilterResult => {
   const { search, search_keys } = queryFilter
-
   if (search && search_keys) {
-    const queryConditions = search_keys.split(',').map((key: any) => ({
-      [key]: { contains: search, mode: 'insensitive' },
-    }))
-
-    return { OR: queryConditions }
+    const keys = search_keys.split(',')
+    const createObject = (keysArray: string[]): KeyObject => {
+      const key = keysArray[0]
+      const remainingKeys = keysArray.slice(1)
+      if (remainingKeys.length === 0) {
+        return { [key]: { contains: search, mode: 'insensitive' } }
+      }
+      return { [key]: createObject(remainingKeys) }
+    }
+    const transformedKeys = keys.map((key) => {
+      const keyArray = key.split('.')
+      return createObject(keyArray)
+    })
+    return { OR: transformedKeys }
   }
   return {}
 }
 
-export const parseFilter = async (queryFilter: any, table: any) => {
+export const parseFilter = (queryFilter: any) => {
   const where: any = {}
   let searchQuery = {}
 
   if (queryFilter) {
     if (queryFilter.search && queryFilter.search_keys) {
-      searchQuery = await handleQuerySearch(queryFilter, table)
+      searchQuery = handleQuerySearch(queryFilter)
     }
     delete queryFilter.search
     delete queryFilter.search_keys
 
     for (const k in queryFilter) {
-      let value = queryFilter[k]
+      const value = queryFilter[k]
       if (typeof value === 'object') {
+        const operators = [
+          'in',
+          'not',
+          'between',
+          'gt',
+          'lt',
+          'gte',
+          'lte',
+          'like',
+        ]
+        const [k2] = Object.keys(value)
+        if (!operators.includes(k2)) {
+          where[k] = { [k2]: validate(value[k2]) }
+        }
         if (value.between) {
           const [val1, val2] = value.between?.split(',')
           where[k] = { gte: val1, lte: val2 }
@@ -125,9 +165,32 @@ export const parseFilter = async (queryFilter: any, table: any) => {
         if (value.in) {
           const arr = value.in?.split(',').map((x: any) => validate(x))
           where[k] = { in: arr }
+          // let arr = [];
+          // if (value.in.eq) {
+          //   arr = value.in?.eq.split(',').map((x: any) => ({
+          //     [k]: { equals: validate(x) },
+          //   }));
+          // } else {
+          //   arr = value.in?.split(',').map((x: any) => ({
+          //     // [k]: { contains: validate(x), mode: 'insensitive' },
+          //     [k]: validate(x),
+          //   }));
+          // }
+          // where.OR = arr;
         }
+        if (value.not) {
+          const arr = value.not?.split(',').map((x: any) => validate(x))
+          if (where.NOT) {
+            where.NOT = { ...where.NOT, [k]: { in: arr } }
+          } else {
+            where.NOT = { [k]: { in: arr } }
+          }
+        }
+
         if (value.gt) where[k] = { gt: validate(value.gt) }
         if (value.lt) where[k] = { lt: validate(value.lt) }
+        if (value.gte) where[k] = { gte: validate(value.gte) }
+        if (value.lte) where[k] = { lte: validate(value.lte) }
         if (value.like)
           where[k] = { contains: validate(value.like), mode: 'insensitive' }
       } else {
@@ -195,20 +258,21 @@ export const handleProcessFile = async (file: any, oldFile: any) => {
       : path.resolve('./public/images')
     let name = ''
 
-    if (oldFile) {
-      name = getFileName(oldFile)
-      const isVideo = ['.mp4', '.webm', '.gif'].some((ext) =>
-        oldFile.includes(ext),
-      )
+    // if (oldFile) {
+    //   name = getFileName(oldFile)
+    //   const isVideo = ['.mp4', '.webm', '.gif'].some((ext) =>
+    //     oldFile.includes(ext),
+    //   )
 
-      const targetPath = isVideo
-        ? path.resolve('./public/videos')
-        : path.resolve('./public/images')
+    //   const targetPath = isVideo
+    //     ? path.resolve('./public/videos')
+    //     : path.resolve('./public/images')
 
-      await unlink(path.join(targetPath, oldFile))
-    } else {
-      name = uuidv4()
-    }
+    //   await unlink(path.join(targetPath, oldFile))
+    // }
+    // else {
+    //   name = uuidv4()
+    // }
     const newFileName = `${name}${fileExtension}`
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)

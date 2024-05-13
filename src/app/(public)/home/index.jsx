@@ -1,33 +1,44 @@
 'use client'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 import * as faceapi from 'face-api.js'
-import axios from 'axios'
-import Clock from '../../../components/Clock'
-import Link from 'next/link'
-import { useGetList } from '~/services/dashboard'
+// import * as timeDelta from 'time-delta'
+// import idLocale from 'time-delta/locales/id'
+import { useGetList, usePost } from '~/services/dashboard'
+import Loading from '~/components/loading'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { calculateEAR } from '~/helpers/utils'
+import dynamic from 'next/dynamic'
+import { toast } from 'react-toastify'
+const Clock = dynamic(() => import('../../../components/Clock'))
 
 function Root() {
-  const [hasilPresensi, setHasilPresensi] = useState()
+  const [ekspresi, setEkspresi] = useState()
   const [camOn, setCamOn] = useState(false)
   const [reportOn, setReportOn] = useState(false)
   const [foto, setFoto] = useState()
+  const [filetoUpload, setFiletoUpload] = useState()
+  const [user, setUser] = useState()
+  const [entryTime, setEntryTime] = useState()
+  const [isPunctual, setIsPunctual] = useState()
+  const [enterExit, setEnterExit] = useState()
   const [faceMatcher, setFaceMatcher] = useState(null)
   const capturedPhotoRef = useRef()
   const webcamRef = useRef()
   const canvasRef = useRef()
   const { data: macAddress } = useGetList('address')
-  const { data: Descriptors } = useGetList('descriptors')
+  const { data: users } = useGetList('users')
+  const { mutateAsync: postReport, error: errorPostReport } = usePost('reports')
+  const { mutateAsync: uploadFile, error: errorUploadFile } = usePost('upload')
+
+  dayjs.extend(relativeTime)
 
   useEffect(() => {
     const setupFaceRecognition = async () => {
       try {
-        // Load models first
-        await loadModels()
-
         // Load labeled face descriptors and create a FaceMatcher
         const labeledFaceDescriptors = await loadLabeledFaceDescriptors()
-
-        setFaceMatcher(new faceapi.FaceMatcher(labeledFaceDescriptors, 0.3))
+        setFaceMatcher(new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6))
       } catch (error) {
         console.error('Error setting up face recognition:', error)
       }
@@ -39,29 +50,30 @@ function Root() {
         faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
         faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
         faceapi.nets.faceExpressionNet.loadFromUri('/models'),
-      ])
+      ]).then(setupFaceRecognition)
     }
 
     const loadLabeledFaceDescriptors = async () => {
       const labeledFaceDescriptors = []
 
-      for (const item of Descriptors) {
+      for (const item of users) {
         const descriptors = []
-
         for (const descriptor of item.descriptors) {
-          const float32ArrayDescriptor = new Float32Array(descriptor)
+          const float32ArrayDescriptor = new Float32Array(
+            Object.values(descriptor),
+          )
           descriptors.push(float32ArrayDescriptor)
         }
-
+        const label = `${item.name} / ${item.nip}`
         labeledFaceDescriptors.push(
-          new faceapi.LabeledFaceDescriptors(item.label, descriptors),
+          new faceapi.LabeledFaceDescriptors(label, descriptors),
         )
       }
       console.log('labeled', labeledFaceDescriptors)
       return labeledFaceDescriptors
     }
-    setupFaceRecognition()
-  }, [Descriptors])
+    loadModels()
+  }, [users])
 
   const handleOn = async () => {
     setCamOn(true)
@@ -110,9 +122,11 @@ function Root() {
   const detectMyFace = () => {
     const webcam = webcamRef.current
     const canvas = canvasRef.current
-    // const displaySize = { width: webcam.videoWidth, height: webcam.videoHeight };
-    // console.log("displaySize", webcamRef.current.videoHeight);
-    // faceapi.matchDimensions(canvas, displaySize);
+    // const displaySize = {
+    //   width: webcam.offsetWidth,
+    //   height: webcam.offsetHeight,
+    // }
+    // faceapi.matchDimensions(canvas, displaySize)
 
     setIntervalId(null)
     const id = setInterval(async () => {
@@ -124,8 +138,8 @@ function Root() {
 
       if (detections) {
         const resizedDetections = faceapi.resizeResults(detections, {
-          width: 640,
-          height: 480,
+          width: webcam.offsetWidth,
+          height: webcam.offsetHeight,
         })
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
 
@@ -134,139 +148,80 @@ function Root() {
         faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
 
         // Face recognition
-        if (faceMatcher) {
-          console.log('JALAN')
-          // console.log('descriptor', detections.descriptor)
-          // console.log('faceMatcher', faceMatcher)
+        if (faceMatcher && !!detections?.descriptor?.length) {
           const bestMatch = faceMatcher.findBestMatch(detections.descriptor)
-          console.log(bestMatch.toString())
-          const label = bestMatch.label
-          const confidence = 1 - bestMatch.distance // Confidence level
-          // console.log('bestMatch: ', bestMatch)
-          // console.log('confidence: ', confidence)
-          // Draw face recognition result on the canvas
-          const text = `${label} (${Math.round(confidence * 100)}%)`
-          console.log(text)
-          new faceapi.draw.DrawTextField([text], {
-            drawLabelOptions: {
-              anchorPosition: 'TL',
-            },
-          }).draw(canvas)
-        }
 
-        // detectBlink(detections)
+          const nama = bestMatch.label.split(' / ')[0]
+          const nip = bestMatch.label.split(' / ')[1]
+          const confidence = 1 - bestMatch.distance
+
+          const text = `${nama} (${Math.round(confidence * 100)}%)`
+          const anchor = {
+            x: resizedDetections.detection.box.x,
+            y: resizedDetections.detection.box.y,
+          }
+          const drawOptions = {
+            anchorPosition: 'BOTTOM_LEFT',
+            backgroundColor: 'rgba(0, 0, 219)',
+          }
+          const drawBox = new faceapi.draw.DrawTextField(
+            text,
+            anchor,
+            drawOptions,
+          )
+          drawBox.draw(canvas)
+          detectBlink(detections, nip)
+        }
       }
     }, 100)
 
     setIntervalId(id)
   }
 
-  const detectBlink = async (detections) => {
-    const leftEye = detections.landmarks.getLeftEye()
-    const rightEye = detections.landmarks.getRightEye()
+  const detectBlink = async (detections, nip) => {
+    try {
+      const leftEye = detections.landmarks.getLeftEye()
+      const rightEye = detections.landmarks.getRightEye()
 
-    const leftEAR = calculateEAR(leftEye)
-    const rightEAR = calculateEAR(rightEye)
+      const leftEAR = calculateEAR(leftEye)
+      const rightEAR = calculateEAR(rightEye)
 
-    const avgEAR = (leftEAR + rightEAR) / 2
+      const avgEAR = (leftEAR + rightEAR) / 2
 
-    const threshold = 0.285
-    if (avgEAR < threshold) {
-      console.log('Blink Detected!')
-      let obj = detections.expressions
-      setHasilPresensi(
-        Object.keys(obj).reduce((a, b) => (obj[a] > obj[b] ? a : b)),
-      )
-      // console.log('ekspresi =', JSON.stringify(obj))
-      // console.log(
-      //   'ekspresi urut =',
-      //   JSON.stringify(
-      //     Object.fromEntries(Object.entries(obj).sort(([, a], [, b]) => b - a)),
-      //   ),
-      // )
-      // console.log(
-      //   'ekspresi dominan',
-      //   Object.keys(obj).reduce((a, b) => (obj[a] > obj[b] ? a : b)),
-      // )
-      await takePhoto()
-      setCamOn(false)
-      stopVideo()
+      const threshold = 0.285
+      if (avgEAR < threshold) {
+        console.log('Blink Detected!')
+
+        const userData = await users.find((u) => u.nip === nip)
+        console.log('userData', userData)
+        await setUser(() => userData)
+
+        let obj = detections.expressions
+        const expression = Object.keys(obj).reduce((a, b) =>
+          obj[a] > obj[b] ? a : b,
+        )
+        const now = new Date()
+        const time = now.getHours() + ':' + now.getMinutes()
+
+        await setEkspresi(expression)
+
+        setEntryTime(time)
+        if (userData.id) {
+          await takePhoto(now, userData, expression)
+          setCamOn(false)
+          stopVideo()
+          // await uploadReport(now, userData, expression)
+        }
+      }
+    } catch (error) {
+      console.log(error)
+      if (error?.response?.data?.message) {
+        toast.error(error?.response?.data?.message)
+      }
     }
   }
 
-  // const detectBlink = (detections) => {
-  //   const leftEye = detections.landmarks.getLeftEye()
-  //   const rightEye = detections.landmarks.getRightEye()
-
-  //   const leftEAR = calculateEAR(leftEye)
-  //   const rightEAR = calculateEAR(rightEye)
-
-  //   const avgEAR = (leftEAR + rightEAR) / 2
-
-  //   const threshold = 0.285 // Adjust this threshold as needed
-  //   const minBlinkDuration = 0.1 // Minimum duration of a blink in seconds
-  //   const maxBlinkDuration = 0.6 // Maximum duration of a blink in seconds
-
-  //   // const minEARForBlink = 0.15; // Adjust this threshold as needed
-  //   const blinkDuration = 0.3 // Duration of a blink in seconds
-
-  //   let startBlinkTime = null
-  //   let lastBlinkTime = null
-
-  //   // if (avgEAR < threshold && (leftEAR < minEARForBlink || rightEAR < minEARForBlink)) {
-  //   if (avgEAR < threshold) {
-  //     const currentTime = Date.now()
-
-  //     if (
-  //       !lastBlinkTime ||
-  //       currentTime - lastBlinkTime > minBlinkDuration * 1000
-  //     ) {
-  //       // Start of a new blink
-  //       startBlinkTime = currentTime
-  //       console.log('Kurang lama Meremnya')
-  //     } else if (currentTime - startBlinkTime > maxBlinkDuration * 1000) {
-  //       // Reset if blink duration exceeds the maximum allowed
-  //       startBlinkTime = currentTime
-  //       console.log('Kelamaan Merem')
-  //     }
-
-  //     if (currentTime - startBlinkTime >= blinkDuration * 1000) {
-  //       // Blink detected, capture photo or take appropriate action
-  //       console.log('Blink Detected!')
-  //       let obj = detections.expressions
-  //       setHasilPresensi(
-  //         Object.keys(obj).reduce((a, b) => (obj[a] > obj[b] ? a : b)),
-  //       )
-  //       // lastBlinkTime = currentTime;
-  //     }
-  //   } else {
-  //     startBlinkTime = null
-  //   }
-  // }
-
-  const calculateEAR = (eyeLandmarks) => {
-    // Hitung jarak Euclidean antara dua set landmark mata vertikal
-    const A = Math.sqrt(
-      Math.pow(eyeLandmarks[1].x - eyeLandmarks[5].x, 2) +
-        Math.pow(eyeLandmarks[1].y - eyeLandmarks[5].y, 2),
-    )
-    const B = Math.sqrt(
-      Math.pow(eyeLandmarks[2].x - eyeLandmarks[4].x, 2) +
-        Math.pow(eyeLandmarks[2].y - eyeLandmarks[4].y, 2),
-    )
-
-    // Hitung jarak Euclidean antara landmark mata horizontal
-    const C = Math.sqrt(
-      Math.pow(eyeLandmarks[0].x - eyeLandmarks[3].x, 2) +
-        Math.pow(eyeLandmarks[0].y - eyeLandmarks[3].y, 2),
-    )
-
-    // Hitung Rasio Aspek Mata (EAR)
-    const ear = (A + B) / (2 * C)
-    return ear
-  }
-
-  const takePhoto = () => {
+  const takePhoto = (now, userData, expression) => {
     const video = webcamRef.current
     const canvas = canvasRef.current
 
@@ -276,51 +231,49 @@ function Root() {
 
       const context = canvas.getContext('2d')
       context.drawImage(video, 0, 0, canvas.width, canvas.height)
-
       canvas.toBlob((blob) => {
+        console.log(blob)
         if (blob) {
           const imageUrl = URL.createObjectURL(blob)
-
+          const myFile = new File([blob], 'photo', { type: 'image/png' })
+          uploadReport(now, userData, expression, myFile)
           // Set the Blob URL as the src for local preview
           capturedPhotoRef.current = {}
           capturedPhotoRef.current.src = imageUrl
           setFoto(imageUrl)
-
-          // Optionally, you can handle the blob or send it to a server
-          // For example, you can use the FormData API to include it in a form submission
-          const formData = new FormData()
-          formData.append('photo', blob, 'captured_photo.png')
-          // Now you can send formData to your server
         }
-      }, 'image/png')
+      })
 
       showReport()
     }
+  }
+
+  const uploadReport = async (now, userData, expression, myFile) => {
+    const payload = {
+      timestamp: now,
+      ekspresi: expression,
+      userId: userData?.id,
+    }
+    const res = await postReport(payload)
+    if (res?.id) {
+      const formData = new FormData()
+      formData.append('file', myFile)
+      formData.append('reportId', res.id)
+      await uploadFile(formData)
+      setFiletoUpload()
+    }
+    console.log('report', report)
   }
 
   const showReport = async () => {
     await setReportOn(true)
     setTimeout(() => {
       setReportOn(false)
-    }, 15000)
-  }
-
-  const manualCapture = () => {
-    takePhoto()
-    setCamOn(false)
-    stopVideo()
+    }, 5000)
   }
 
   return (
     <div className="flex flex-col gap-4 justify-between items-center p-8 h-screen relative">
-      <Link href="/reports">
-        <button
-          className="absolute right-5 top-5 bg-gray-500 hover:bg-gray-700
-          text-white font-bold py-2 px-4 rounded"
-        >
-          Reports
-        </button>
-      </Link>
       <div className="flex grow justify-center">
         {camOn && (
           <div name="webcam-div" className="flex items-center relative">
@@ -329,24 +282,35 @@ function Root() {
               ref={canvasRef}
               width="640"
               height="480"
-              className="absolute top-22 z-10 border-5 border-purple-600"
+              className="absolute inset-y-auto z-10 border-5 border-purple-600"
             />
           </div>
         )}
-        {reportOn && (
+        {!camOn && !!reportOn && (
           <div name="report-div" className="flex items-center">
             <img src={foto} alt="ini foto" />
-            <div className="px-8 text-2xl font-normal">
-              <p>nama: nama dummy</p>
-              <p>unit: unit dummy A2</p>
-              <p>waktu presensi: dummy 07:28</p>
-              <p>ketepatan waktu: tepat waktu</p>
-              <p>ekspresi: {hasilPresensi}</p>
+            <div className="px-8 text-xl space-y-1.5 font-normal">
+              <p>Nama: {user?.name}</p>
+              <p>NIP: {user?.nip}</p>
+              <p>
+                Jabatan:
+                {user?.position?.charAt(0) +
+                  user?.position?.slice(1).toLowerCase()}
+              </p>
+              <p>
+                Unit: {user?.unit}{' '}
+                {user?.subunit && <span>- {user?.subunit}</span>}
+              </p>
+              <p>Waktu Presensi: {entryTime}</p>
+              <p>Ketepatan Waktu: {isPunctual}</p>
+              <p>Ekspresi: {ekspresi}</p>
             </div>
           </div>
         )}
       </div>
-      <div name="clock-and-info" className="grid justify-items-center gap-2">
+      {faceMatcher === null ? (
+        <Loading />
+      ) : (
         <button
           type="button"
           className={`${camOn ? 'bg-gray-500' : 'bg-blue-500'} ${
@@ -356,12 +320,8 @@ function Root() {
         >
           {`${camOn ? 'Matikan' : 'Nyalakan'}`} Kamera
         </button>
-        <button
-          className="bg-emerald-700 py-2 px-4 rounded"
-          onClick={manualCapture}
-        >
-          Take Photo
-        </button>
+      )}
+      <div name="clock-and-info" className="grid justify-items-center gap-2">
         <Clock />
         <div className="text-xl2 text-center">
           Your MAC Address:{' '}

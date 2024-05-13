@@ -89,7 +89,7 @@ export default function Footer({ light }: any) {
       } `}
     >
       <div className="w-wrap py-[37px] lg:pt-[96px] lg:pb-[142px] px-[25px] lg:px-[153px] text-center">
-        <div data-aos="fade-up" data-aos-duration="1000">
+        <div>
           <h6 className="text-xs lg:text-2xl font-bold ">
             Cannot find what you were looking for?
           </h6>

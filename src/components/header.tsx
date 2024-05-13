@@ -66,12 +66,10 @@ export default function Header() {
           {showMenus && (
             <>
               <div
-                data-aos="fade-left"
                 className="absolute z-[70] top-0 right-0 left-0 w-screen h-screen bg-[#191919]"
                 onClick={() => setShowMenus(!showMenus)}
               />
               <div
-                data-aos="fade-left"
                 onClick={() => setShowMenus(!showMenus)}
                 className="absolute z-[80] top-20 right-0 left-0  w-screen flex flex-col"
               >

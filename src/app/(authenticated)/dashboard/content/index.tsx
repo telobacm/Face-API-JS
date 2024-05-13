@@ -14,8 +14,7 @@ export default function Content() {
   const role = data?.user?.role
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login')
-    if (status === 'authenticated' && role == 'USER')
-      router.push('/dashboard/settings')
+    // if (status === 'authenticated' && role == 'USER') router.push('/reports')
   }, [status, router, role])
 
   const grouped = groupByPage(contents || [])

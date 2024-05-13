@@ -1,7 +1,7 @@
 import * as qs from 'qs'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '~/../prisma/client'
-import { unlink } from 'fs/promises'
+// import { unlink } from 'fs/promises'
 import path from 'path'
 import {
   HandleError,
@@ -26,7 +26,7 @@ export const LIST = async (req: NextRequest) => {
       ...query
     }: any = qs.parse(url)
 
-    const where = await parseFilter(query, table)
+    const where = await parseFilter(query?.filter)
     const orderBy = parseSort(sort)
 
     formatIncludeOrSelect(include)
@@ -53,7 +53,7 @@ export const LIST = async (req: NextRequest) => {
   }
 }
 
-export const DETAIL = async (req: NextRequest, { params }: any) => {
+export const DETAIL = async (req: NextRequest, { params, where }: any) => {
   try {
     const table = req.nextUrl.pathname.split('/')[2]
     const url = new URL(req.url).search.substring(1)
@@ -61,7 +61,7 @@ export const DETAIL = async (req: NextRequest, { params }: any) => {
 
     formatIncludeOrSelect(include)
     const queryParams: any = {
-      where: {
+      where: where || {
         id: table.includes('user') ? params.id.toString() : parseInt(params.id),
       },
       include,
@@ -107,7 +107,7 @@ export const UPDATE = async (req: NextRequest, { params }: any) => {
 
       const targetPath = isVideo ? videoPath : imagePath
 
-      await unlink(path.join(targetPath, deletedImage))
+      // await unlink(path.join(targetPath, deletedImage))
     }
     if (deletedImage2) {
       const isVideo = ['.mp4', '.webm', '.gif'].some((ext) =>
@@ -116,7 +116,7 @@ export const UPDATE = async (req: NextRequest, { params }: any) => {
 
       const targetPath = isVideo ? videoPath : imagePath
 
-      await unlink(path.join(targetPath, deletedImage2))
+      // await unlink(path.join(targetPath, deletedImage2))
     }
 
     return NextResponse.json(updated)
