@@ -9,7 +9,11 @@ import {
   BiLogOut,
   BiUserPlus,
 } from 'react-icons/bi'
-import { AiOutlineSetting, AiOutlineTeam } from 'react-icons/ai'
+import {
+  AiOutlineApartment,
+  AiOutlineSetting,
+  AiOutlineTeam,
+} from 'react-icons/ai'
 
 const adminMenus = [
   {
@@ -18,6 +22,7 @@ const adminMenus = [
       { icon: <BiArchive />, label: 'reports', href: '/reports' },
       { icon: <AiOutlineTeam />, label: 'users', href: '/users' },
       { icon: <BiUserPlus />, label: 'register', href: '/register' },
+      { icon: <AiOutlineApartment />, label: 'units', href: '/units' },
       { icon: <BiDesktop />, label: 'devices', href: '/devices' },
     ],
   },
@@ -160,7 +165,7 @@ export default function SidebarAdmin({
       </div>
 
       <button
-        className="flex gap-3 items-center justify-center text-white  bg-red-800 font-bold w-min mx-auto py-3 px-5 rounded-xl whitespace-nowrap"
+        className="flex gap-3 items-center justify-center text-white  bg-red-700 font-bold w-min mx-auto py-3 px-5 rounded-xl whitespace-nowrap"
         onClick={() => signOut()}
       >
         <BiLogOut />

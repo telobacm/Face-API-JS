@@ -36,9 +36,12 @@ export default function HeaderAdmin(props: {
           </button>
 
           <Link className="block flex-shrink-0 lg:hidden" href="/">
-            <div className="relative ">
+            {/* <div className="relative ">
               <img src={'/logo.png'} alt="" className="h-10" />
-            </div>
+            </div> */}
+            <h1 className="font-semibold text-white md:text-black">
+              FaceApiJS
+            </h1>
           </Link>
         </div>
         <div className="flex justify-end gap-6 w-full items-end 2xsm:gap-7">

@@ -1,8 +1,6 @@
 'use client'
 import { useRef, useEffect, useState, useCallback } from 'react'
 import * as faceapi from 'face-api.js'
-// import * as timeDelta from 'time-delta'
-// import idLocale from 'time-delta/locales/id'
 import { useGetList, usePost } from '~/services/dashboard'
 import Loading from '~/components/loading'
 import dayjs from 'dayjs'
@@ -17,7 +15,6 @@ function Root() {
   const [camOn, setCamOn] = useState(false)
   const [reportOn, setReportOn] = useState(false)
   const [foto, setFoto] = useState()
-  const [filetoUpload, setFiletoUpload] = useState()
   const [user, setUser] = useState()
   const [entryTime, setEntryTime] = useState()
   const [isPunctual, setIsPunctual] = useState()
@@ -32,7 +29,6 @@ function Root() {
   const { mutateAsync: uploadFile, error: errorUploadFile } = usePost('upload')
 
   dayjs.extend(relativeTime)
-
   useEffect(() => {
     const setupFaceRecognition = async () => {
       try {
@@ -254,13 +250,16 @@ function Root() {
       ekspresi: expression,
       userId: userData?.id,
     }
+    const formData = new FormData()
+    Object.keys(payload).forEach((key) => {
+      formData.append(key, payload[key])
+    })
     const res = await postReport(payload)
     if (res?.id) {
       const formData = new FormData()
       formData.append('file', myFile)
       formData.append('reportId', res.id)
       await uploadFile(formData)
-      setFiletoUpload()
     }
     console.log('report', report)
   }

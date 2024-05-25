@@ -125,29 +125,44 @@ export const UPDATE = async (req: NextRequest, { params }: any) => {
   }
 }
 
+// export const REMOVE = async (req: NextRequest, { params }: any) => {
+//   try {
+//     const table = req.nextUrl.pathname.split('/')[2]
+//     const url = new URLSearchParams(req.url)
+//     const force = url.get('force')
+//     if (force) {
+//       await prisma[table].delete({
+//         where: {
+//           id: table.includes('user')
+//             ? params.id.toString()
+//             : parseInt(params.id),
+//         },
+//       })
+//     } else {
+//       await prisma[table].update({
+//         where: {
+//           id: table.includes('user')
+//             ? params.id.toString()
+//             : parseInt(params.id),
+//         },
+//         data: { active: false },
+//       })
+//     }
+//     return new NextResponse(null, { status: 204 })
+//   } catch (error: any) {
+//     return HandleError(error)
+//   }
+// }
+
 export const REMOVE = async (req: NextRequest, { params }: any) => {
   try {
     const table = req.nextUrl.pathname.split('/')[2]
     const url = new URLSearchParams(req.url)
-    const force = url.get('force')
-    if (force) {
-      await prisma[table].delete({
-        where: {
-          id: table.includes('user')
-            ? params.id.toString()
-            : parseInt(params.id),
-        },
-      })
-    } else {
-      await prisma[table].update({
-        where: {
-          id: table.includes('user')
-            ? params.id.toString()
-            : parseInt(params.id),
-        },
-        data: { active: false },
-      })
-    }
+    await prisma[table].delete({
+      where: {
+        id: table.includes('user') ? params.id.toString() : parseInt(params.id),
+      },
+    })
     return new NextResponse(null, { status: 204 })
   } catch (error: any) {
     return HandleError(error)

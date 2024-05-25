@@ -22,11 +22,12 @@ export default function Header() {
     <header className="sticky top-0 z-[99999] bg-gradient-to-r from-[#0C0C0C] from-60% to-[#232323] text-white">
       <div className="w-wrap flex justify-between items-center py-[13px] px-5 lg:py-5 lg:px-20">
         <Link href={'/'}>
-          <img
+          {/* <img
             src="/logo.png"
             alt="logo"
             className="w-auto h-[28.29px] lg:h-[49px]"
-          />
+          /> */}
+          <h1 className="font-semibold">FaceApiJS</h1>
         </Link>
 
         <nav className="hidden lg:flex grow gap-7 justify-end ">

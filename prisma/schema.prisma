@@ -33,16 +33,47 @@ model Users {
   password    String
   nip         String     @unique
   email       String     @unique
-  kampus      String
   role        USER_ROLES
   position    POSITIONS
   gender      String
-  unit        String?
-  subunit     String?
+  whitelist   Boolean    @default(false)
+  kampusId    Int
+  unitId      Int
+  subunitId   Int?
   descriptors Json
   Reports     Reports[]
+  kampus      Kampus     @relation(fields: [kampusId], references: [id])
+  unit        Unit       @relation(fields: [unitId], references: [id])
+  subunit     Subunit?   @relation(fields: [subunitId], references: [id])
 
   @@map("users")
+}
+
+model Kampus {
+  id      Int       @id @unique @default(autoincrement())
+  name    String
+  Devices Devices[]
+  Users   Users[]
+
+  @@map("kampus")
+}
+
+model Unit {
+  id      Int       @id @unique @default(autoincrement())
+  name    String
+  Devices Devices[]
+  Users   Users[]
+
+  @@map("unit")
+}
+
+model Subunit {
+  id       Int       @id @unique @default(autoincrement())
+  name     String
+  position POSITIONS
+  Users    Users[]
+
+  @@map("subunit")
 }
 
 model Reports {
@@ -60,10 +91,12 @@ model Reports {
 }
 
 model Devices {
-  id     String @id @unique @default(cuid())
-  kampus String
-  unit   String
-  mac    String
+  id       String @id @unique @default(cuid())
+  mac      String
+  kampusId Int
+  unitId   Int
+  kampus   Kampus @relation(fields: [kampusId], references: [id])
+  unit     Unit   @relation(fields: [unitId], references: [id])
 
   @@map("devices")
 }

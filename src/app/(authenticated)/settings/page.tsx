@@ -197,7 +197,7 @@ export default function Setting() {
                 <button
                   onClick={() => setisEdit(false)}
                   type="button"
-                  className={`bg-red-800 text-white flex w-full justify-center rounded  font-bold p-3  text-gray`}
+                  className={`bg-red-700 text-white flex w-full justify-center rounded  font-bold p-3  text-gray`}
                 >
                   CANCEL
                 </button>
@@ -214,7 +214,7 @@ export default function Setting() {
             <button
               type={'button'}
               onClick={() => setisEdit(true)}
-              className={`bg-red-800 text-primary flex w-full justify-center rounded  font-bold p-3  text-gray mt-10`}
+              className={`bg-red-700 text-primary flex w-full justify-center rounded  font-bold p-3  text-gray mt-10`}
             >
               EDIT
             </button>

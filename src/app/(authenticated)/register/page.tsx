@@ -4,33 +4,38 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { usePost } from '~/services/dashboard'
+import { useGetList, usePost } from '~/services/dashboard'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import AdminLayout from '~/app/(authenticated)/components/layoutAdmin'
 import RegisterCamera from './RegisterCamera'
-import {
-  genders,
-  kampus,
-  positions,
-  subUnitDosen,
-  subUnitStaff,
-  units,
-} from '~/helpers/constant'
+import { genders, positions } from '~/helpers/constant'
+import Loading from '~/components/loading'
 import { useSession } from 'next-auth/react'
 
-const Register = ({ session }: any) => {
+const Register = () => {
   const router = useRouter()
-  const { status, data: sessionData }: any = useSession()
-  const role = sessionData?.user?.role
+  const { status, data }: any = useSession()
+  const role = data?.user?.role
   useEffect(() => {
-    if (status === 'unauthenticated') router.push('/login')
-    if (status === 'authenticated' && role == 'USER') router.push('/reports')
+    // if (status === 'unauthenticated') router.push('/login')
+    // if (status === 'authenticated' && role == 'USER') router.push('/reports')
   }, [status, router, role])
-
+  const {
+    data: kampus,
+    isLoading: isLoadingKampus,
+    isSuccess: isSuccessKampus,
+  } = useGetList('kampus')
+  const { data: units, isLoading: isLoadingUnits } = useGetList('unit')
+  const { data: subUnitDosen, isLoading: isLoadingSubUnitDosen } = useGetList(
+    'subunit',
+    { filter: { position: 'DOSEN' } },
+  )
+  const { data: subUnitStaff, isLoading: isLoadingSubUnitStaff } = useGetList(
+    'subunit',
+    { filter: { position: 'STAFF' } },
+  )
   const { mutateAsync: registerUser, error: errorRegisterUser }: any =
     usePost('users')
-  const { mutateAsync: recordFace, error: errorRecordFace }: any =
-    usePost('descriptors')
   const [faceDescriptors, setFaceDescriptors] = useState<any[]>([])
   const [values, setValues] = useState({ pass: '', confirmPass: '' })
   const [showPass, setShowPass] = useState({
@@ -39,17 +44,24 @@ const Register = ({ session }: any) => {
   })
   const [position, setPosition] = useState<string>('')
   const [unit, setUnit] = useState<string>('')
+  const [unitLabel, setUnitLabel] = useState<string>('')
   const [subUnit, setSubUnit] = useState<string>('')
   const [subUnitOptions, setSubUnitOptions] = useState(subUnitStaff)
 
   useEffect(() => {
-    if (position === 'STAFF') {
-      setSubUnitOptions(subUnitStaff)
-    }
     if (position === 'DOSEN') {
       setSubUnitOptions(subUnitDosen)
+    } else {
+      setSubUnitOptions(subUnitStaff)
     }
   }, [position])
+
+  const unitChange = (x: any) => {
+    const id = x.split('/')[0]
+    const name = x.split('/')[1]
+    setUnit(id)
+    setUnitLabel(name)
+  }
 
   const handleToggleShowPass = (inputName: string) => {
     setShowPass((prevShowPass: any) => ({
@@ -64,8 +76,8 @@ const Register = ({ session }: any) => {
       e.preventDefault()
       const {
         fullname,
-        nip,
         email,
+        nip,
         kampus,
         gender,
         password,
@@ -73,8 +85,10 @@ const Register = ({ session }: any) => {
       } = e.target
       const payloadUser: any = {
         name: fullname.value,
-        nip: nip.value,
         email: email.value,
+        nip: nip.value,
+        kampus: { connect: { id: parseInt(kampus.value) } },
+        unit: { connect: { id: parseInt(unit) } },
         position: position,
         gender: gender.value,
         password: password.value,
@@ -83,28 +97,8 @@ const Register = ({ session }: any) => {
         descriptors: faceDescriptors,
       }
 
-      if (role === 'SUPERADMIN') {
-        payloadUser.kampus = kampus.value
-      } else if (role === 'ADMIN') {
-        payloadUser.kampus = sessionData?.user?.kampus
-      }
-
-      if (position !== 'SATPAM') {
-        if (role === 'SUPERADMIN') {
-          payloadUser.unit = unit
-        } else if (role === 'ADMIN') {
-          payloadUser.unit = sessionData?.user?.unit
-        }
-      } else {
-        payloadUser.unit = 'Satpam'
-      }
-
-      if (position !== 'SATPAM' && !unit.includes('Direktorat')) {
-        if (role === 'SUPERADMIN') {
-          payloadUser.subunit = subUnit
-        } else if (role === 'ADMIN') {
-          payloadUser.subunit = sessionData?.user?.unit
-        }
+      if (!unit.includes('Direktorat')) {
+        payloadUser.subunit = { connect: { id: parseInt(subUnit) } }
       }
 
       if (password.length < 6) {
@@ -133,14 +127,21 @@ const Register = ({ session }: any) => {
     }
   }, [errorRegisterUser])
 
-  useEffect(() => {
-    if (errorRecordFace) {
-      toast.error(errorRecordFace?.response?.data?.message)
-    }
-  }, [errorRecordFace])
+  // console.log('kampus', kampus)
+  // console.log('units', units)
+  // console.log('subUnitDosen', subUnitDosen)
+  // console.log('subUnitStaff', subUnitStaff)
 
+  const isLoading =
+    isLoadingKampus &&
+    isLoadingUnits &&
+    isLoadingSubUnitDosen &&
+    isLoadingSubUnitStaff
+
+  if (isLoading) {
+    return <Loading />
+  }
   return (
-    // status == 'authenticated' && (
     <AdminLayout sidebar={true} header={true}>
       <div className="">
         <form
@@ -170,6 +171,20 @@ const Register = ({ session }: any) => {
                   </div>
                   <div>
                     <label className="mb-1 mt-3 block font-medium text-black">
+                      Email
+                    </label>
+                    <div className="relative">
+                      <input
+                        required
+                        name="email"
+                        type="email"
+                        placeholder="Enter your Fullname"
+                        className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="mb-1 mt-3 block font-medium text-black">
                       NIP
                     </label>
                     <div className="relative">
@@ -184,16 +199,30 @@ const Register = ({ session }: any) => {
                   </div>
                   <div>
                     <label className="mb-1 mt-3 block font-medium text-black">
-                      Email
+                      Kampus
                     </label>
                     <div className="relative">
-                      <input
+                      <select
                         required
-                        name="email"
-                        type="email"
-                        placeholder="Enter your Email"
+                        name="kampus"
                         className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                      />
+                      >
+                        <option
+                          value=""
+                          disabled
+                          selected
+                          hidden
+                          className="text-gray-400"
+                        >
+                          Pilih Kampus
+                        </option>
+                        {!!kampus?.length &&
+                          kampus?.map((x: any, i: number) => (
+                            <option key={i} value={x?.id}>
+                              {x?.name}
+                            </option>
+                          ))}
+                      </select>
                     </div>
                   </div>
                   <div>
@@ -224,70 +253,36 @@ const Register = ({ session }: any) => {
                       </select>
                     </div>
                   </div>
-                  {role === 'SUPERADMIN' ? (
-                    <>
-                      <div>
-                        <label className="mb-1 mt-3 block font-medium text-black">
-                          Kampus
-                        </label>
-                        <div className="relative">
-                          <select
-                            required
-                            name="kampus"
-                            className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                          >
-                            <option
-                              value=""
-                              disabled
-                              selected
-                              hidden
-                              className="text-gray-400"
-                            >
-                              Pilih Kampus
+                  <div>
+                    <label className="mb-1 mt-3 block font-medium text-black">
+                      Unit
+                    </label>
+                    <div className="relative">
+                      <select
+                        required
+                        name="unit"
+                        onChange={(e) => unitChange(e.target.value)}
+                        className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                      >
+                        <option
+                          value=""
+                          disabled
+                          selected
+                          hidden
+                          className="text-gray-400"
+                        >
+                          Pilih Unit
+                        </option>
+                        {!!units?.length &&
+                          units?.map((x: any, i: number) => (
+                            <option key={i} value={x.id + '/' + x.name}>
+                              {x?.name}
                             </option>
-                            {kampus.map((option, index) => (
-                              <option key={index} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                      {position !== 'SATPAM' && (
-                        <div>
-                          <label className="mb-1 mt-3 block font-medium text-black">
-                            Unit
-                          </label>
-                          <div className="relative">
-                            <select
-                              required
-                              name="unit"
-                              onChange={(e) => setUnit(e.target.value)}
-                              className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                            >
-                              <option
-                                value=""
-                                disabled
-                                selected
-                                hidden
-                                className="text-gray-400"
-                              >
-                                Pilih Unit
-                              </option>
-                              {units.map((option, index) => (
-                                <option key={index} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    ''
-                  )}
-                  {position !== 'SATPAM' && !unit.includes('Direktorat') && (
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+                  {unitLabel.length && !unitLabel.includes('Direktorat') ? (
                     <div>
                       <label className="mb-1 mt-3 block font-medium text-black">
                         Sub Unit
@@ -296,6 +291,7 @@ const Register = ({ session }: any) => {
                         <select
                           required
                           name="subunit"
+                          disabled={!position.length}
                           onChange={(e) => setSubUnit(e.target.value)}
                           className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                         >
@@ -308,14 +304,17 @@ const Register = ({ session }: any) => {
                           >
                             Pilih Sub Unit
                           </option>
-                          {subUnitOptions.map((option, index) => (
-                            <option key={index} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
+                          {!!subUnitOptions?.length &&
+                            subUnitOptions?.map((x: any, i: number) => (
+                              <option key={i} value={x?.id}>
+                                {x?.name}
+                              </option>
+                            ))}
                         </select>
                       </div>
                     </div>
+                  ) : (
+                    ''
                   )}
                   <div>
                     <label className="mb-1 mt-3 block font-medium text-black">
@@ -344,7 +343,6 @@ const Register = ({ session }: any) => {
                       </select>
                     </div>
                   </div>
-
                   <PasswordInput
                     label="Password"
                     name="password"
@@ -385,7 +383,6 @@ const Register = ({ session }: any) => {
       </div>
     </AdminLayout>
   )
-  // )
 }
 
 function PasswordInput({
