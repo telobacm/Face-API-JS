@@ -41,7 +41,7 @@ model Users {
   unitId      Int
   subunitId   Int?
   descriptors Json
-  Reports     Reports[]
+  reports     Reports[]
   kampus      Kampus     @relation(fields: [kampusId], references: [id])
   unit        Unit       @relation(fields: [unitId], references: [id])
   subunit     Subunit?   @relation(fields: [subunitId], references: [id])
@@ -52,8 +52,8 @@ model Users {
 model Kampus {
   id      Int       @id @unique @default(autoincrement())
   name    String
-  Devices Devices[]
-  Users   Users[]
+  devices Devices[]
+  users   Users[]
 
   @@map("kampus")
 }
@@ -61,8 +61,8 @@ model Kampus {
 model Unit {
   id      Int       @id @unique @default(autoincrement())
   name    String
-  Devices Devices[]
-  Users   Users[]
+  devices Devices[]
+  users   Users[]
 
   @@map("unit")
 }
@@ -71,7 +71,7 @@ model Subunit {
   id       Int       @id @unique @default(autoincrement())
   name     String
   position POSITIONS
-  Users    Users[]
+  users    Users[]
 
   @@map("subunit")
 }

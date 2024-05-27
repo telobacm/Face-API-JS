@@ -255,13 +255,13 @@ function Root() {
       formData.append(key, payload[key])
     })
     const res = await postReport(payload)
-    if (res?.id) {
-      const formData = new FormData()
-      formData.append('file', myFile)
-      formData.append('reportId', res.id)
-      await uploadFile(formData)
-    }
-    console.log('report', report)
+    // if (res?.id) {
+    //   const formData = new FormData()
+    //   formData.append('file', myFile)
+    //   formData.append('reportId', res.id)
+    //   await uploadFile(formData)
+    // }
+    // console.log('report', report)
   }
 
   const showReport = async () => {
@@ -290,6 +290,7 @@ function Root() {
             <img src={foto} alt="ini foto" />
             <div className="px-8 text-xl space-y-1.5 font-normal">
               <p>Nama: {user?.name}</p>
+              {/* 
               <p>NIP: {user?.nip}</p>
               <p>
                 Jabatan:
@@ -302,7 +303,7 @@ function Root() {
               </p>
               <p>Waktu Presensi: {entryTime}</p>
               <p>Ketepatan Waktu: {isPunctual}</p>
-              <p>Ekspresi: {ekspresi}</p>
+              <p>Ekspresi: {ekspresi}</p> */}
             </div>
           </div>
         )}

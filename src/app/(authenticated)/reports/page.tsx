@@ -9,6 +9,12 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Doughnut } from 'react-chartjs-2'
 import PieChart from '../components/PieChart'
+import { BiSolidUserDetail } from 'react-icons/bi'
+import Link from 'next/link'
+import dayjs from 'dayjs'
+import 'dayjs/locale/id'
+
+dayjs.locale('id')
 
 export default function Reports() {
   const [searchValue, setSearchValue] = useState('')
@@ -29,6 +35,8 @@ export default function Reports() {
         },
       },
     },
+    //NOTE: selesaikan sort by date descendant
+    // sort: { timestamp: 'desc' },
   }
 
   const {
@@ -41,6 +49,16 @@ export default function Reports() {
     {
       accessorKey: 'user.name',
       header: 'Nama',
+      cell: ({ row }: any) => (
+        <div className="flex justify-between">
+          <span>{row?.original?.user?.name}</span>
+          <Link href={`reports/${row?.original?.user?.id}`}>
+            <div className="w-fit p-2.5 -m-2 rounded-lg hover:bg-blue-400 text-black hover:text-blue-100">
+              <BiSolidUserDetail />
+            </div>
+          </Link>
+        </div>
+      ),
     },
     {
       accessorKey: 'user.nip',
@@ -57,8 +75,24 @@ export default function Reports() {
       cell: ({ row }: any) => <span>{row?.original?.user?.unit?.name}</span>,
     },
     {
-      accessorKey: 'ekspresi',
-      header: 'Ekspresi',
+      accessorKey: 'enterExit',
+      header: 'Masuk/Pulang',
+    },
+    {
+      accessorKey: 'timestamp',
+      header: 'Tanggal',
+      cell: ({ cell }: any) => {
+        const date = dayjs(cell.getValue())
+        return date.format('dddd, DD MMMM YYYY')
+      },
+    },
+    {
+      accessorKey: 'timestamp',
+      header: 'Jam',
+      cell: ({ cell }: any) => {
+        const date = dayjs(cell.getValue())
+        return date.format('HH:mm:ss')
+      },
     },
     {
       accessorKey: 'isPunctual',
@@ -66,6 +100,15 @@ export default function Reports() {
       cell: ({ row }: any) => (
         <span>{row?.original?.isPunctual === 'Tepat Waktu' ? '✅' : '❌'}</span>
       ),
+    },
+    {
+      accessorKey: 'ekspresi',
+      header: 'Ekspresi',
+    },
+    {
+      accessorKey: 'foto',
+      header: 'Foto',
+      cell: ({ row }: any) => <span></span>,
     },
   ]
   // console.log('isLoading', isLoading)
@@ -95,11 +138,6 @@ export default function Reports() {
             data={tableData}
             counted="ekspresi"
             label="Chart Ekspresi"
-          />
-          <PieChart
-            data={tableData}
-            counted="isPunctual"
-            label="Chart Tepat Waktu"
           />
         </div>
         <Table

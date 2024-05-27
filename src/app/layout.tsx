@@ -13,7 +13,7 @@ import { SessionProvider } from 'next-auth/react'
 import { useState } from 'react'
 
 // export const metadata: Metadata = {
-//   title: 'Atomionics',
+//   title: 'FaceApiJS',
 //   description: '',
 // }
 export const dynamic = 'force-dynamic'

@@ -52,9 +52,10 @@ export default function SidebarAdmin({
 
   const session: any = useSession()
   const role = session?.data?.user?.role
+  const userId = session?.data?.user?.id
   if (role === 'USER') {
     adminMenus[0].items = [
-      { icon: <BiArchive />, label: 'reports', href: '/reports' },
+      { icon: <BiArchive />, label: 'reports', href: `/reports/${userId}` },
     ]
   }
   if (role === 'ADMIN') {

@@ -19,8 +19,7 @@ export default function Setting() {
     isLoading: isLoadingSession,
   }: any = useSession()
   const { data: currentUser, isLoading: isLoadingUser } =
-    useGetList('users/' + !!sessionData?.user?.id && sessionData?.user?.id) ||
-    {}
+    useGetList('users/' + sessionData?.user?.id) || {}
   console.log('currentUser', currentUser)
 
   const { mutateAsync: updateUser } = usePatch('users')
@@ -42,7 +41,6 @@ export default function Setting() {
     // if (!isLoadingSession) {
     if (status === 'unauthenticated') {
       router.push('/login')
-      console.log('MENTAL !!!')
     }
     // }
   }, [status, isLoadingSession, router])
