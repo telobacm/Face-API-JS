@@ -3,15 +3,17 @@ import React, { useEffect, useState } from 'react'
 import Table from '../../../components/Table'
 import { useGetList } from '~/services/dashboard'
 import AdminLayout from '../components/layoutAdmin'
-import NotFoundComponent from '~/components/NotFound'
 import Loading from '~/components/loading'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import DeleteItem from '../components/deleteItem'
+import AddDevice from './addDevice'
+import EditDevice from './editDevice'
 
 export default function Devices() {
   const [searchValue, setSearchValue] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const search_keys = 'kampus,unit'
+  const search_keys = 'kampus, unit'
   const filtered: any = {
     page: currentPage,
     filter: {
@@ -28,30 +30,27 @@ export default function Devices() {
 
   const columnDefWithCheckBox = () => [
     {
-      accessorKey: 'user.name',
-      header: 'Nama',
+      accessorKey: 'mac',
+      header: 'Mac Address',
     },
     {
-      accessorKey: 'user.nip',
-      header: 'NIP',
-    },
-    {
-      accessorKey: 'user.kampus',
+      accessorKey: 'kampus',
       header: 'Kampus',
+      cell: ({ row }: any) => <span>{row?.original?.kampus?.name}</span>,
     },
     {
-      accessorKey: 'user.unit',
+      accessorKey: 'unit',
       header: 'Unit',
+      cell: ({ row }: any) => <span>{row?.original?.unit?.name}</span>,
     },
     {
-      accessorKey: 'ekspresi',
-      header: 'Ekspresi',
-    },
-    {
-      accessorKey: 'isPunctual',
-      header: 'Tepat Waktu',
+      accessorKey: 'action',
+      header: 'Action',
       cell: ({ row }: any) => (
-        <span>{row?.original?.isPunctual === 'Tepat Waktu' ? '✅' : '❌'}</span>
+        <div className="flex justify-center items-center">
+          <EditDevice prop="devices" data={row?.original} />
+          <DeleteItem prop="devices" data={row?.original} />
+        </div>
       ),
     },
   ]
@@ -64,13 +63,19 @@ export default function Devices() {
   const role = data?.user?.role
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login')
-    if (status === 'authenticated' && role == 'USER') router.push('/reports')
+    if (status === 'authenticated' && role !== 'SUPERADMIN')
+      router.push('/settings')
   }, [status, router, role])
 
+  if (isLoading) {
+    return <Loading />
+  }
   return (
     status == 'authenticated' && (
       <AdminLayout sidebar={true} header={true}>
-        {isLoading && <Loading />}
+        <div className="flex justify-end">
+          <AddDevice prop="devices" />
+        </div>
         <Table
           searchValueProps={[searchValue, setSearchValue]}
           currentPageProps={[currentPage, setCurrentPage]}

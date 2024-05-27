@@ -62,7 +62,9 @@ export const DETAIL = async (req: NextRequest, { params, where }: any) => {
     formatIncludeOrSelect(include)
     const queryParams: any = {
       where: where || {
-        id: table.includes('user') ? params.id.toString() : parseInt(params.id),
+        id: table.includes('users')
+          ? params.id.toString()
+          : parseInt(params.id),
       },
       include,
     }

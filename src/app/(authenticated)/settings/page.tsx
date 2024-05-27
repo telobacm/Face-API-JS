@@ -9,14 +9,23 @@ import { useRouter } from 'next/navigation'
 import { useGetList, usePatch } from '~/services/dashboard'
 import AdminLayout from '~/app/(authenticated)/components/layoutAdmin'
 import FloatInput from '~/components/floatInput'
+import Loading from '~/components/loading'
 
 export default function Setting() {
   const router = useRouter()
-  const { data: session, status }: any = useSession()
-  const { data: currentUser } = useGetList('users/' + session?.user?.id) || {}
+  const {
+    data: sessionData,
+    status,
+    isLoading: isLoadingSession,
+  }: any = useSession()
+  const { data: currentUser, isLoading: isLoadingUser } =
+    useGetList('users/' + !!sessionData?.user?.id && sessionData?.user?.id) ||
+    {}
+  console.log('currentUser', currentUser)
+
   const { mutateAsync: updateUser } = usePatch('users')
   const { mutateAsync: updatePassword, error: errorUpdatePass }: any =
-    usePatch('user/password')
+    usePatch('users/password')
 
   const [isEdit, setisEdit] = useState(true)
 
@@ -30,8 +39,13 @@ export default function Setting() {
   const [changePass, setchangePass] = useState(false)
 
   useEffect(() => {
-    if (status === 'unauthenticated') router.push('/login')
-  }, [status, router])
+    // if (!isLoadingSession) {
+    if (status === 'unauthenticated') {
+      router.push('/login')
+      console.log('MENTAL !!!')
+    }
+    // }
+  }, [status, isLoadingSession, router])
 
   useEffect(() => {
     if (errorUpdatePass) {
@@ -42,11 +56,11 @@ export default function Setting() {
   const handleSubmit = async (e: any) => {
     try {
       e.preventDefault()
-      const { oldPassword, newPassword, confirmNewPassword, name, email } =
-        e.target
+      const { oldPassword, newPassword, confirmNewPassword, name } = e.target
+
       await updateUser({
         id: currentUser?.id,
-        // payload: { name: name.value },
+        payload: { name: name.value },
       })
       if (changePass) {
         await updatePassword({
@@ -70,8 +84,13 @@ export default function Setting() {
     }))
   }
 
+  const isLoading = isLoadingSession && isLoadingUser
+
+  if (isLoading) {
+    return <Loading />
+  }
   return (
-    status == 'authenticated' && (
+    status === 'authenticated' && (
       <AdminLayout>
         <div className="rounded-xl   bg-white shadow p-6 lg:p-10 ">
           <div className=" pb-4 ">
@@ -84,12 +103,12 @@ export default function Setting() {
                   <FloatInput
                     readOnly
                     disabled={!isEdit}
-                    label="Full Name"
-                    name="fullname"
+                    label="Name"
+                    name="name"
                     type="text"
                     placeholder="Full Name"
                     defaultValue={currentUser?.name}
-                    // className="w-full rounded border-[1.5px]  bg-transparent py-3 px-5  outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                    className="cursor-not-allowed"
                   />
                   <FloatInput
                     readOnly
@@ -98,8 +117,55 @@ export default function Setting() {
                     type="email"
                     defaultValue={currentUser?.email}
                     placeholder="Enter your email address"
-                    // className="w-full rounded border-[1.5px]  bg-transparent py-3 px-5  outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                    className="cursor-not-allowed"
                   />
+                  <FloatInput
+                    readOnly
+                    label="NIP"
+                    name="nip"
+                    type="text"
+                    defaultValue={currentUser?.nip}
+                    // placeholder="Enter your NIP"
+                    className="cursor-not-allowed"
+                  />
+                  <FloatInput
+                    readOnly
+                    label="Position"
+                    name="position"
+                    type="text"
+                    defaultValue={currentUser?.position}
+                    // placeholder="Enter your NIP"
+                    className="cursor-not-allowed"
+                  />
+                  <FloatInput
+                    readOnly
+                    label="Kampus"
+                    name="kampus"
+                    type="text"
+                    defaultValue={currentUser?.kampus?.name}
+                    // placeholder="Enter your kampus"
+                    className="cursor-not-allowed"
+                  />
+                  <FloatInput
+                    readOnly
+                    label="Unit"
+                    name="unit"
+                    type="text"
+                    defaultValue={currentUser?.unit?.name}
+                    // placeholder="Enter your kampus"
+                    className="cursor-not-allowed"
+                  />
+                  {currentUser?.subunit && (
+                    <FloatInput
+                      readOnly
+                      label="SubUnit"
+                      name="subunit"
+                      type="text"
+                      defaultValue={currentUser?.subunit?.name}
+                      // placeholder="Enter your kampus"
+                      className="cursor-not-allowed"
+                    />
+                  )}
                 </>
               )}
             </div>
@@ -214,7 +280,7 @@ export default function Setting() {
             <button
               type={'button'}
               onClick={() => setisEdit(true)}
-              className={`bg-red-700 text-primary flex w-full justify-center rounded  font-bold p-3  text-gray mt-10`}
+              className={`bg-red-700 text-white flex w-full justify-center rounded  font-bold p-3  text-gray mt-10`}
             >
               EDIT
             </button>

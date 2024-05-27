@@ -1,10 +1,11 @@
 'use client'
 import React from 'react'
-import { useDelete, usePatch } from '~/services/dashboard'
-import AreYouSure from '../components/confirmDelete'
+import { useDelete } from '~/services/dashboard'
+import ConfirmDeleteModal from './confirmDeleteModal'
 
-export default function Delete({ data, prop }: any) {
+export default function DeleteItem({ data, prop }: any) {
   const { mutateAsync: deleteItem }: any = useDelete(prop)
+  console.log('id item', data.id)
 
   const handleSubmit = async (e: any) => {
     try {
@@ -15,12 +16,12 @@ export default function Delete({ data, prop }: any) {
   }
 
   return (
-    <AreYouSure
+    <ConfirmDeleteModal
       data={data}
       title={`Hapus ${prop.charAt(0).toUpperCase() + prop.slice(1)}`}
       prop={prop}
       showImage={false}
       handleSubmit={handleSubmit}
-    ></AreYouSure>
+    ></ConfirmDeleteModal>
   )
 }

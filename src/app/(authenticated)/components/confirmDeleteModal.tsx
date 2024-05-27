@@ -4,7 +4,7 @@ import React, { useCallback, useState } from 'react'
 import { AiOutlineClose } from 'react-icons/ai'
 import { BiTrash } from 'react-icons/bi'
 
-export default function ConfirmDelete({
+export default function ConfirmDeleteModal({
   title,
   children,
   data,
@@ -27,8 +27,8 @@ export default function ConfirmDelete({
   return (
     <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <Dialog.Trigger asChild>
-        <div className="px-3">
-          <button className="text-lg mx-auto inline-flex justify-center">
+        <div className="px-1">
+          <button className="text-lg mx-auto inline-flex justify-center  w-fit p-2.5 -m-2 rounded-lg hover:bg-red-500 text-black hover:text-gray-300">
             <BiTrash />
           </button>
         </div>

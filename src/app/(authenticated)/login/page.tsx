@@ -8,7 +8,6 @@ import { BiLock, BiMailSend, BiLogoGoogle } from 'react-icons/bi'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import AdminLayout from '~/app/(authenticated)/components/layoutAdmin'
-import { AiOutlineNumber } from 'react-icons/ai'
 
 const Login = ({ session }: any) => {
   const router = useRouter()
@@ -16,9 +15,10 @@ const Login = ({ session }: any) => {
   const role = data?.user?.role
   useEffect(() => {
     if (status == 'authenticated') {
-      router.push('reports')
+      router.push('settings')
     }
   }, [status, router, role])
+  console.log('session', session)
 
   const handleSubmit = async (e: any) => {
     try {
@@ -41,7 +41,7 @@ const Login = ({ session }: any) => {
 
       if (res?.error == null) {
         toast.success('Success!')
-        router.push('/reports')
+        router.push('/settings')
       } else {
         toast.error('Incorrect Email or Password!')
       }

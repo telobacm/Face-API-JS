@@ -7,8 +7,12 @@ import AdminLayout from '../components/layoutAdmin'
 import Loading from '~/components/loading'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { BiSolidUserDetail } from 'react-icons/bi'
+import { Tooltip } from '@nextui-org/react'
 
-export default function Users() {
+export default function Users(session: any) {
+  console.log('session', session)
+
   const [searchValue, setSearchValue] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const search_keys = 'name,nip'
@@ -37,10 +41,12 @@ export default function Users() {
     {
       accessorKey: 'kampus',
       header: 'Kampus',
+      cell: ({ row }: any) => <span>{row?.original?.kampus?.name}</span>,
     },
     {
       accessorKey: 'unit',
       header: 'Unit',
+      cell: ({ row }: any) => <span>{row?.original?.unit?.name}</span>,
     },
     {
       accessorKey: 'position',
@@ -54,6 +60,21 @@ export default function Users() {
       accessorKey: 'password',
       header: 'Password',
     },
+    {
+      accessorKey: 'action',
+      header: 'Action',
+      cell: ({ row }: any) => (
+        // <Tooltip content="detail" color="secondary">
+        <div className="flex justify-center">
+          <Link href={`users/${row?.original?.id}`}>
+            <div className="w-fit p-2.5 -m-2 rounded-lg hover:bg-blue-400 text-black hover:text-blue-100">
+              <BiSolidUserDetail />
+            </div>
+          </Link>
+        </div>
+        // </Tooltip>
+      ),
+    },
   ]
 
   const showNotFound = isSuccess && !userList?.length
@@ -62,14 +83,24 @@ export default function Users() {
   const { status, data }: any = useSession()
   const role = data?.user?.role
   useEffect(() => {
-    if (status === 'unauthenticated') router.push('/login')
-    if (status === 'authenticated' && role == 'USER') router.push('/reports')
+    console.log('status', status)
+
+    if (status !== 'loading') {
+      if (status === 'unauthenticated') {
+        router.push('/login')
+      }
+      if (status === 'authenticated' && role == 'USER') {
+        router.push('/settings')
+      }
+    }
   }, [status, router, role])
 
+  if (isLoading) {
+    return <Loading />
+  }
   return (
     status == 'authenticated' && (
       <AdminLayout sidebar={true} header={true}>
-        {isLoading && <Loading />}
         <Table
           searchValueProps={[searchValue, setSearchValue]}
           currentPageProps={[currentPage, setCurrentPage]}

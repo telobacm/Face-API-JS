@@ -5,28 +5,37 @@ import CharLimit from '~/components/charLimit'
 import { useGetList } from '~/services/dashboard'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import Add from './add'
-import Edit from './edit'
-import Delete from './delete'
+import Loading from '~/components/loading'
+import AddUnit from './addUnit'
+import EditUnit from './editUnit'
+import DeleteItem from '../components/deleteItem'
 
 export default function Page() {
-  const { data: kampus } = useGetList('kampus')
-  const { data: unit } = useGetList('unit')
-  const { data: subunit } = useGetList('subunit')
+  const { data: kampus, isLoading: isLoadingKampus } = useGetList('kampus')
+  const { data: unit, isLoading: isLoadingUnit } = useGetList('unit')
+  const { data: subunit, isLoading: isLoadingSubunit } = useGetList('subunit')
   const router = useRouter()
-  const { status, data }: any = useSession()
-  const role = data?.user?.role
+  const { status, data: sessionData }: any = useSession()
+  const role = sessionData?.user?.role
   useEffect(() => {
-    // if (status === 'unauthenticated') router.push('/login')
-    // if (status === 'authenticated' && role !== 'SUPERADMIN') router.push('/reports')
+    if (status === 'unauthenticated') router.push('/login')
+    if (status === 'authenticated' && role !== 'SUPERADMIN')
+      router.push('/reports')
+    if (status === 'authenticated' && role === 'USER')
+      router.push(`/reports/${sessionData?.user?.id}`)
   }, [status, router, role])
+  const isLoading = isLoadingKampus && isLoadingUnit && isLoadingSubunit
+
+  if (isLoading) {
+    return <Loading />
+  }
   return (
     <AdminLayout>
       {/* KAMPUS */}
       <div className="mb-16">
         <div className="flex justify-between mb-5">
           <div className="text-2xl font-bold">Kampus</div>
-          <Add prop="kampus" />
+          <AddUnit prop="kampus" />
         </div>
         <div className="bg-white">
           <div className="max-w-full overflow-x-auto">
@@ -56,8 +65,8 @@ export default function Page() {
                         {kampus?.name}
                       </td>
                       <td className="flex text-center w-fit px-2 py-2 lg:px-5 lg:py-3.5 whitespace-pre-line">
-                        <Edit prop="kampus" data={kampus} />
-                        <Delete prop="kampus" data={kampus} />
+                        <EditUnit prop="kampus" data={kampus} />
+                        <DeleteItem prop="kampus" data={kampus} />
                       </td>
                     </tr>
                   ))}
@@ -70,7 +79,7 @@ export default function Page() {
       <div className="mb-16">
         <div className="flex justify-between mb-5">
           <div className="text-2xl font-bold">Unit</div>
-          <Add prop="unit" />
+          <AddUnit prop="unit" />
         </div>
         <div className="bg-white">
           <div className="max-w-full overflow-x-auto">
@@ -100,8 +109,8 @@ export default function Page() {
                         {unit?.name}
                       </td>
                       <td className="flex text-center px-2 py-2 lg:px-5 lg:py-3.5 whitespace-pre-line ">
-                        <Edit prop="unit" data={unit} />
-                        <Delete prop="unit" data={unit} />
+                        <EditUnit prop="unit" data={unit} />
+                        <DeleteItem prop="unit" data={unit} />
                       </td>
                     </tr>
                   ))}
@@ -114,7 +123,7 @@ export default function Page() {
       <div>
         <div className="flex justify-between mb-5">
           <div className="text-2xl font-bold">Sub-Unit</div>
-          <Add prop="subunit" />
+          <AddUnit prop="subunit" />
         </div>
         <div className="bg-white">
           <div className="max-w-full overflow-x-auto">
@@ -149,8 +158,8 @@ export default function Page() {
                         {subunit?.name}
                       </td>
                       <td className="flex text-center px-2 py-2 lg:px-5 lg:py-3.5 whitespace-pre-line ">
-                        <Edit prop="subunit" data={subunit} />
-                        <Delete prop="subunit" data={subunit} />
+                        <EditUnit prop="subunit" data={subunit} />
+                        <DeleteItem prop="subunit" data={subunit} />
                       </td>
                     </tr>
                   ))}

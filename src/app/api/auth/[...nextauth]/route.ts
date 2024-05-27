@@ -55,13 +55,23 @@ const authOptions: NextAuthOptions = {
       const user = await prisma.users.findUnique({
         where: { email: token.email || '' },
       })
+
+      const kampus = await prisma.kampus.findUnique({
+        where: { id: user?.kampusId },
+      })
+      const unit = await prisma.unit.findUnique({
+        where: { id: user?.unitId },
+      })
+
       session.user = {
         ...session.user,
         name: user?.name,
         role: user?.role,
         nip: user?.nip,
-        kampus: user?.kampus,
-        unit: user?.unit,
+        kampusId: user?.kampusId,
+        kampusLabel: kampus?.name,
+        unitId: user?.unitId,
+        unitLabel: unit?.name,
         id: user?.id,
       }
       return session

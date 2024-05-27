@@ -39,16 +39,16 @@ export default function EditModal({
   return (
     <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <Dialog.Trigger asChild>
-        <div className={`${defaultAdd ? '' : 'px-3'} ${isAdd ? '' : 'm-auto'}`}>
+        <div className={`${defaultAdd ? '' : 'px-1'} ${isAdd ? '' : 'm-auto'}`}>
           {isAdd ? (
             <button
-              className={`capitalize flex gap-3 items-center bg-primary text-white font-bold w-min py-2 px-5 rounded-xl whitespace-nowrap ${className}`}
+              className={`capitalize flex gap-3 items-center bg-primary hover:bg-blue-600 text-white font-bold w-min py-2 px-5 rounded-xl whitespace-nowrap ${className}`}
             >
               <BiAddToQueue />
               Add {detail}
             </button>
           ) : (
-            <button className="text-lg mx-auto inline-flex justify-center">
+            <button className="text-lg mx-auto inline-flex justify-center w-fit p-2.5 -m-2 rounded-lg hover:bg-yellow-300 text-black hover:font-bold hover:text-gray-700">
               <BiPencil />
             </button>
           )}

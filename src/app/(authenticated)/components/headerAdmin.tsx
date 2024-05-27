@@ -56,11 +56,15 @@ export default function HeaderAdmin(props: {
               <div className="flex flex-col text-sm text-white md:text-black">
                 <div>
                   Kampus:{' '}
-                  <span className="font-semibold">{session?.user?.kampus}</span>
+                  <span className="font-semibold">
+                    {session?.user?.kampusLabel}
+                  </span>
                 </div>
                 <div>
                   Unit:{' '}
-                  <span className="font-semibold">{session?.user?.unit}</span>
+                  <span className="font-semibold">
+                    {session?.user?.unitLabel}
+                  </span>
                 </div>
               </div>
             </div>

@@ -1,16 +1,14 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import Table from '../../../components/Table'
 import { useGetList } from '~/services/dashboard'
-import AdminLayout from '../components/layoutAdmin'
 import NotFoundComponent from '~/components/NotFound'
 import Loading from '~/components/loading'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { Doughnut } from 'react-chartjs-2'
-import PieChart from '../components/PieChart'
+import AdminLayout from '../../components/layoutAdmin'
+import Table from '~/components/Table'
 
-export default function Reports() {
+export default function UserReport() {
   const [searchValue, setSearchValue] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const search_keys = 'user.name,user.nip'
@@ -20,15 +18,7 @@ export default function Reports() {
       search: searchValue,
       search_keys: search_keys,
     },
-    include: {
-      user: {
-        include: {
-          kampus: true,
-          unit: true,
-          subunit: true,
-        },
-      },
-    },
+    include: { user: true },
   }
 
   const {
@@ -47,14 +37,12 @@ export default function Reports() {
       header: 'NIP',
     },
     {
-      accessorKey: 'kampus',
+      accessorKey: 'user.kampus',
       header: 'Kampus',
-      cell: ({ row }: any) => <span>{row?.original?.user?.kampus?.name}</span>,
     },
     {
-      accessorKey: 'unit',
+      accessorKey: 'user.unit',
       header: 'Unit',
-      cell: ({ row }: any) => <span>{row?.original?.user?.unit?.name}</span>,
     },
     {
       accessorKey: 'ekspresi',
@@ -84,24 +72,10 @@ export default function Reports() {
     }
   }, [status, router, role])
 
-  if (isLoading) {
-    return <Loading />
-  }
   return (
     status == 'authenticated' && (
       <AdminLayout sidebar={true} header={true}>
-        <div className="flex justify-end gap-6">
-          <PieChart
-            data={tableData}
-            counted="ekspresi"
-            label="Chart Ekspresi"
-          />
-          <PieChart
-            data={tableData}
-            counted="isPunctual"
-            label="Chart Tepat Waktu"
-          />
-        </div>
+        {isLoading && <Loading />}
         <Table
           searchValueProps={[searchValue, setSearchValue]}
           currentPageProps={[currentPage, setCurrentPage]}
