@@ -27,6 +27,8 @@ export default function Devices() {
     isLoading,
     isSuccess,
   } = useGetList('devices', filtered)
+  const { data: thisDevice } = useGetList('address')
+  console.log('thisDevice', thisDevice)
 
   const columnDefWithCheckBox = () => [
     {
@@ -73,7 +75,47 @@ export default function Devices() {
   return (
     status == 'authenticated' && (
       <AdminLayout sidebar={true} header={true}>
-        <div className="flex justify-end">
+        <div className="flex justify-between items-start">
+          {!!thisDevice && (
+            <div className="grid text-normal">
+              {!thisDevice?.deviceInfo?.id && (
+                <>
+                  <div>
+                    Perangkat ini tidak terdaftar untuk mesin presensi, ingin
+                    anda daftarkan ?
+                  </div>
+                  <div className="flex gap-2">
+                    mac adress:{' '}
+                    {thisDevice?.macList?.map((x: string, i: number) => (
+                      <p key={i}>
+                        <span className="font-semibold">{x}</span>
+                        {i < thisDevice.macList.length - 1 && ','}
+                      </p>
+                    ))}
+                  </div>
+                </>
+              )}
+              {!!thisDevice?.deviceInfo?.id && (
+                <>
+                  <div className="mb-1.5">
+                    Perangkat ini terdaftar untuk mesin presensi:
+                  </div>
+                  <div className="">
+                    Kampus:{' '}
+                    <span className="font-semibold">
+                      {thisDevice?.deviceInfo?.kampus?.name}
+                    </span>
+                  </div>
+                  <div className="">
+                    Unit:{' '}
+                    <span className="font-semibold">
+                      {thisDevice?.deviceInfo?.unit?.name}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
           <AddDevice prop="devices" />
         </div>
         <Table

@@ -9,9 +9,16 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { BiSolidUserDetail } from 'react-icons/bi'
 import { Tooltip } from '@nextui-org/react'
+import { toast } from 'react-toastify'
 
 export default function Users(session: any) {
-  console.log('session', session)
+  useEffect(() => {
+    const toastMessage = sessionStorage.getItem('toastMessage')
+    if (toastMessage) {
+      toast.success(toastMessage)
+      sessionStorage.removeItem('toastMessage')
+    }
+  }, [])
 
   const [searchValue, setSearchValue] = useState('')
   const [currentPage, setCurrentPage] = useState(1)

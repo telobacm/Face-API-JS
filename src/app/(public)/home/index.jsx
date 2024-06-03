@@ -11,32 +11,38 @@ import { toast } from 'react-toastify'
 const Clock = dynamic(() => import('../../../components/Clock'))
 
 function Root() {
-  const [ekspresi, setEkspresi] = useState()
   const [camOn, setCamOn] = useState(false)
   const [reportOn, setReportOn] = useState(false)
   const [foto, setFoto] = useState()
   const [user, setUser] = useState()
   const [entryTime, setEntryTime] = useState()
-  const [isPunctual, setIsPunctual] = useState()
   const [enterExit, setEnterExit] = useState()
+  const [isPunctual, setIsPunctual] = useState()
+  const [ekspresi, setEkspresi] = useState()
+  const [errMessage, setErrMessage] = useState()
   const [faceMatcher, setFaceMatcher] = useState(null)
   const capturedPhotoRef = useRef()
   const webcamRef = useRef()
   const canvasRef = useRef()
-  const { data: macAddress } = useGetList('address')
-  const { data: users } = useGetList('users')
+  const { data: thisDevice } = useGetList('address')
+  const { data: users, isSuccess: isSuccessUsers } = useGetList('users', {
+    filter: { role: { not: 'SUPERADMIN' } },
+  })
   const { mutateAsync: postReport, error: errorPostReport } = usePost('reports')
   const { mutateAsync: uploadFile, error: errorUploadFile } = usePost('upload')
 
+  // console.log('thisDevice', thisDevice?.deviceInfo)
   dayjs.extend(relativeTime)
   useEffect(() => {
     const setupFaceRecognition = async () => {
-      try {
-        // Load labeled face descriptors and create a FaceMatcher
-        const labeledFaceDescriptors = await loadLabeledFaceDescriptors()
-        setFaceMatcher(new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6))
-      } catch (error) {
-        console.error('Error setting up face recognition:', error)
+      if (isSuccessUsers) {
+        try {
+          // Load labeled face descriptors and create a FaceMatcher
+          const labeledFaceDescriptors = await loadLabeledFaceDescriptors()
+          setFaceMatcher(new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6))
+        } catch (error) {
+          console.error('Error setting up face recognition:', error)
+        }
       }
     }
 
@@ -50,23 +56,25 @@ function Root() {
     }
 
     const loadLabeledFaceDescriptors = async () => {
-      const labeledFaceDescriptors = []
+      if (isSuccessUsers) {
+        const labeledFaceDescriptors = []
 
-      for (const item of users) {
-        const descriptors = []
-        for (const descriptor of item.descriptors) {
-          const float32ArrayDescriptor = new Float32Array(
-            Object.values(descriptor),
+        for (const item of users) {
+          const descriptors = []
+          for (const descriptor of item.descriptors) {
+            const float32ArrayDescriptor = new Float32Array(
+              Object.values(descriptor),
+            )
+            descriptors.push(float32ArrayDescriptor)
+          }
+          const label = `${item.name} / ${item.nip}`
+          labeledFaceDescriptors.push(
+            new faceapi.LabeledFaceDescriptors(label, descriptors),
           )
-          descriptors.push(float32ArrayDescriptor)
         }
-        const label = `${item.name} / ${item.nip}`
-        labeledFaceDescriptors.push(
-          new faceapi.LabeledFaceDescriptors(label, descriptors),
-        )
+        console.log('labeled', labeledFaceDescriptors)
+        return labeledFaceDescriptors
       }
-      console.log('labeled', labeledFaceDescriptors)
-      return labeledFaceDescriptors
     }
     loadModels()
   }, [users])
@@ -75,6 +83,11 @@ function Root() {
     setCamOn(true)
     startVideo()
     reportOn && setReportOn(false)
+    setEntryTime(null)
+    setEnterExit(null)
+    setIsPunctual(null)
+    setEkspresi(null)
+    setErrMessage(null)
   }
 
   const handleOff = async () => {
@@ -197,7 +210,8 @@ function Root() {
           obj[a] > obj[b] ? a : b,
         )
         const now = new Date()
-        const time = now.getHours() + ':' + now.getMinutes()
+        const time =
+          now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds()
 
         await setEkspresi(expression)
 
@@ -206,14 +220,12 @@ function Root() {
           await takePhoto(now, userData, expression)
           setCamOn(false)
           stopVideo()
-          // await uploadReport(now, userData, expression)
+          await uploadReport(now, userData, expression)
         }
       }
     } catch (error) {
       console.log(error)
-      if (error?.response?.data?.message) {
-        toast.error(error?.response?.data?.message)
-      }
+      toast.error(error?.response?.data?.message)
     }
   }
 
@@ -245,32 +257,47 @@ function Root() {
   }
 
   const uploadReport = async (now, userData, expression, myFile) => {
-    const payload = {
-      timestamp: now,
-      ekspresi: expression,
-      userId: userData?.id,
+    try {
+      const payload = {
+        timestamp: now,
+        ekspresi: expression,
+        userId: userData?.id,
+      }
+      const formData = new FormData()
+      Object.keys(payload).forEach((key) => {
+        formData.append(key, payload[key])
+      })
+      // BUG: upload image error
+      const res = await postReport(payload)
+      if (res?.id) {
+        setEnterExit(res?.enterExit)
+        setIsPunctual(res?.isPunctual)
+        // const formData = new FormData()
+        // formData.append('file', myFile)
+        // formData.append('reportId', res.id)
+        // await uploadFile(formData)
+      }
+      // BUG: toast nggak muncul, padahal di tempat lain bentuknya sama gini
+      toast.success('Presensi Sukses!')
+    } catch (error) {
+      console.log('error message', error?.response?.data?.message)
+      console.log('type message', typeof error?.response?.data?.message)
+      setErrMessage(error?.response?.data?.message)
+      toast.error(error?.response?.data?.message)
     }
-    const formData = new FormData()
-    Object.keys(payload).forEach((key) => {
-      formData.append(key, payload[key])
-    })
-    const res = await postReport(payload)
-    // if (res?.id) {
-    //   const formData = new FormData()
-    //   formData.append('file', myFile)
-    //   formData.append('reportId', res.id)
-    //   await uploadFile(formData)
-    // }
-    // console.log('report', report)
   }
 
   const showReport = async () => {
     await setReportOn(true)
     setTimeout(() => {
       setReportOn(false)
-    }, 5000)
+    }, 10000)
   }
 
+  // const isLoading = isLoadingAddress && isLoadingUsers
+  // if (faceMatcher === null) {
+  //   return <isLoading />
+  // }
   return (
     <div className="flex flex-col gap-4 justify-between items-center p-8 h-screen relative">
       <div className="flex grow justify-center">
@@ -286,24 +313,33 @@ function Root() {
           </div>
         )}
         {!camOn && !!reportOn && (
-          <div name="report-div" className="flex items-center">
-            <img src={foto} alt="ini foto" />
-            <div className="px-8 text-xl space-y-1.5 font-normal">
-              <p>Nama: {user?.name}</p>
-              {/* 
-              <p>NIP: {user?.nip}</p>
-              <p>
-                Jabatan:
-                {user?.position?.charAt(0) +
-                  user?.position?.slice(1).toLowerCase()}
-              </p>
-              <p>
-                Unit: {user?.unit}{' '}
-                {user?.subunit && <span>- {user?.subunit}</span>}
-              </p>
-              <p>Waktu Presensi: {entryTime}</p>
-              <p>Ketepatan Waktu: {isPunctual}</p>
-              <p>Ekspresi: {ekspresi}</p> */}
+          <div className="grid justify-items-center">
+            {!!errMessage && (
+              <div className="flex items-center bg-red-400 w-fit h-fit mt-16">
+                <div className="bg-red-600 h-10 w-2.5" />
+                <p className="text-xl font-normal px-5">{errMessage}</p>
+              </div>
+            )}
+            <div name="report-div" className="flex items-center">
+              <img src={foto} alt="ini foto" />
+              <div className="px-8 text-xl space-y-1.5 font-normal">
+                {!!enterExit && (
+                  <p className="text-2xl font-semibold">
+                    {' '}
+                    Presensi {enterExit}
+                  </p>
+                )}
+                <p>Nama: {user?.name}</p>
+                <p>NIP: {user?.nip}</p>
+                <p>
+                  Jabatan:
+                  {user?.position?.charAt(0) +
+                    user?.position?.slice(1).toLowerCase()}
+                </p>
+                <p>Waktu Presensi: {entryTime}</p>
+                {!!isPunctual && <p>Ketepatan Waktu: {isPunctual}</p>}
+                <p>Ekspresi: {ekspresi}</p>
+              </div>
             </div>
           </div>
         )}
@@ -323,10 +359,22 @@ function Root() {
       )}
       <div name="clock-and-info" className="grid justify-items-center gap-2">
         <Clock />
-        <div className="text-xl2 text-center">
-          Your MAC Address:{' '}
-          <b>{!!macAddress?.wlp1s0?.length && macAddress?.wlp1s0[0]?.mac}</b>
-        </div>
+        {!!thisDevice?.deviceInfo?.id && (
+          <div className="grid justify-items-center text-lg">
+            <div>
+              Kampus:{' '}
+              <span className="font-semibold">
+                {thisDevice?.deviceInfo?.kampus?.name}
+              </span>
+            </div>
+            <div>
+              Unit:{' '}
+              <span className="font-semibold">
+                {thisDevice?.deviceInfo?.unit?.name}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -40,7 +40,8 @@ const Login = ({ session }: any) => {
       })
 
       if (res?.error == null) {
-        toast.success('Success!')
+        toast.success('Login Sukses!')
+        sessionStorage.setItem('toastMessage', 'Login Sukses!')
         router.push('/settings')
       } else {
         toast.error('Incorrect Email or Password!')
@@ -50,41 +51,7 @@ const Login = ({ session }: any) => {
     }
   }
 
-  {
-    /* with nip, still fail */
-  }
-  // const handleSubmit = async (e: any) => {
-  //   try {
-  //     e.preventDefault()
-  //     const nip = e.target.nip.value
-  //     const password = e.target.password.value
-  //     if (nip === '') return toast.error('NIP tidak boleh kosong!')
-  //     if (password === '') return toast.error('Password tidak boleh kosong!')
-
-  //     // if (password.length < 6) {
-  //     //   toast.error('Password must be at least 6 characters long')
-  //     //   return
-  //     // }
-
-  //     const res = await signIn('credentials', {
-  //       nip,
-  //       password,
-  //       redirect: false,
-  //     })
-
-  //     if (res?.error == null) {
-  //       toast.success('Success!')
-  //       router.push('/reports')
-  //     } else {
-  //       toast.error('Incorrect NIP or Password!')
-  //     }
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }
-
   return (
-    // <SessionProvider session={session}>
     <AdminLayout sidebar={false} header={false}>
       <div className="flex h-screen justify-center items-center">
         <div className="md:w-[600px] rounded border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -95,23 +62,6 @@ const Login = ({ session }: any) => {
                   Sign In
                 </h2>
                 <form onSubmit={handleSubmit}>
-                  {/* with nip, still fail */}
-                  {/* <div className="mb-4">
-                      <label className="mb-2.5 block font-medium text-black dark:text-white">
-                        NIP
-                      </label>
-                      <div className="relative">
-                        <input
-                          name="nip"
-                          type="text"
-                          placeholder="Masukkan NIP Anda"
-                          className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                        />
-                        <span className="absolute right-4 top-4">
-                          <AiOutlineNumber className="text-2xl opacity-50" />
-                        </span>
-                      </div>
-                    </div> */}
                   <div className="mb-4">
                     <label className="mb-2.5 block font-medium text-black dark:text-white">
                       Email
@@ -158,7 +108,6 @@ const Login = ({ session }: any) => {
         </div>
       </div>
     </AdminLayout>
-    // </SessionProvider>
   )
 }
 

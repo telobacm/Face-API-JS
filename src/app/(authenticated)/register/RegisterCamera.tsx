@@ -69,6 +69,7 @@ const RegisterCamera = ({ faceDescriptors, setFaceDescriptors }: any) => {
       .finally(() => {
         detectMyFace()
       })
+    toast.info('Ambil 5 foto user !')
   }
 
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
@@ -143,10 +144,10 @@ const RegisterCamera = ({ faceDescriptors, setFaceDescriptors }: any) => {
 
     if (counter > 1) {
       setCounter((prevCounter) => prevCounter - 1)
-      toast.success(`Take ${counter - 1} more photo(s) !`)
+      toast.info(`Ambil ${counter - 1} foto lagi !`)
     } else {
       setCounter(0)
-      toast.success(`5 photos added`)
+      toast.success(`5 foto telah ditambahkan`)
       setCamOn(false)
       stopVideo()
     }

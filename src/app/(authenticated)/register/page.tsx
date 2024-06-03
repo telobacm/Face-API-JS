@@ -135,8 +135,12 @@ const Register = () => {
         return
       }
 
-      await registerUser(payloadUser)
-      router.push('/users')
+      const res = await registerUser(payloadUser)
+      if (res?.error == null) {
+        toast.success('User berhasil ditambahkan.')
+        sessionStorage.setItem('toastMessage', 'User berhasil ditambahkan.')
+        router.push('/users')
+      }
     } catch (error) {
       console.log(error)
     }

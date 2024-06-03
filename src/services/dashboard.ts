@@ -28,23 +28,6 @@ export const useGetList = (table: string, params: any = {}) => {
   })
 }
 
-//NOTE: not sure if working
-export const useGetDetail = (table: string, id: string | number) => {
-  return useQuery({
-    queryKey: [table, id],
-    queryFn: async () => {
-      try {
-        const { data } = await api().get(`/${table}/${id}`)
-        return data ? data : null
-      } catch (error) {
-        console.error('useGetDetail', error)
-        return null
-      }
-    },
-    initialData: null,
-  })
-}
-
 export const usePatch = (table: string, params: any = null) => {
   const queryClient = useQueryClient()
 
@@ -88,11 +71,6 @@ export const usePost = (table: any, params: any = null) => {
       queryClient.invalidateQueries(params ? [table, params] : [table])
     },
     onError: (error: any) => {
-      // console.log(error)
-      console.log(
-        'error?.response?.data?.message',
-        error?.response?.data?.message,
-      )
       // if (error?.response?.data?.message) {
       toast.error(error?.response?.data?.message)
       // }

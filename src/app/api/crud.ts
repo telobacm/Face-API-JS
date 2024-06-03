@@ -98,7 +98,10 @@ export const UPDATE = async (req: NextRequest, { params }: any) => {
     const { deletedImage, deletedImage2, ...data } = await req.json()
     const updated = await prisma[table].update({
       where: {
-        id: table.includes('user') ? params.id.toString() : parseInt(params.id),
+        id:
+          table.includes('users') || table.includes('devices')
+            ? params.id.toString()
+            : parseInt(params.id),
       },
       data,
     })

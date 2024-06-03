@@ -12,6 +12,14 @@ import FloatInput from '~/components/floatInput'
 import Loading from '~/components/loading'
 
 export default function Setting() {
+  useEffect(() => {
+    const toastMessage = sessionStorage.getItem('toastMessage')
+    if (toastMessage) {
+      toast.success(toastMessage)
+      sessionStorage.removeItem('toastMessage')
+    }
+  }, [])
+
   const router = useRouter()
   const {
     data: sessionData,

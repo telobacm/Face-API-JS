@@ -107,12 +107,14 @@ export const POST = async (req: NextRequest, { params }: any) => {
       orderBy: { timestamp: 'desc' },
       where: { userId: body?.userId || '' },
     })
+    console.log('lastReport', lastReport)
 
     if (!lastReport?.enterExit) {
+      console.log('!lastReport?.enterExit')
       data.enterExit = 'Masuk'
       countEnterPunctuality(user, data, body)
-    }
-    if (lastReport?.enterExit === 'Pulang') {
+    } else if (lastReport?.enterExit === 'Pulang') {
+      console.log('lastReport?.enterExit === Pulang')
       if (
         dayjs(lastReport.timestamp).format('YYYY-MM-DD') ===
         dayjs(body.timestamp).format('YYYY-MM-DD')
@@ -125,17 +127,14 @@ export const POST = async (req: NextRequest, { params }: any) => {
         data.enterExit = 'Masuk'
         countEnterPunctuality(user, data, body)
       }
-    }
-    if (lastReport?.enterExit === 'Masuk') {
+    } else if (lastReport?.enterExit === 'Masuk') {
       console.log('lastReport?.enterExit === Masuk')
       countExitAllowance(user, data, body, lastReport)
     }
-    // data.shiftSatpam = 'Tengah Malam'
     const created = await prisma.reports.create({ data: data })
 
     return NextResponse.json(created)
   } catch (error: any) {
-    console.log(error)
     return HandleError(error)
   }
 }

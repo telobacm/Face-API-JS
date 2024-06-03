@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import { POSITIONS, Prisma, PrismaClient, USER_ROLES } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -87,7 +87,32 @@ const subunitSeed: Prisma.SubunitUncheckedCreateInput[] = [
   { position: 'DOSEN', name: 'Departemen Psikologi Pendidikan dan Bimbingan' },
 ]
 
+const superAdmin = {
+  name: 'Super Admin',
+  email: 'superadmin@mailinator.com',
+  password: 'asdzxc',
+  nip: 'A1',
+  role: USER_ROLES.SUPERADMIN,
+  position: POSITIONS.STAFF,
+  kampusId: 1,
+  unitId: 1,
+  gender: 'Pria',
+  whitelist: false,
+  descriptors: [{}],
+}
+
 async function main() {
+  // clear
+  console.log('clearing existed data if there any...')
+  await prisma.reports.deleteMany({})
+  await prisma.users.deleteMany({})
+  await prisma.devices.deleteMany({})
+  await prisma.kampus.deleteMany({})
+  await prisma.unit.deleteMany({})
+  await prisma.subunit.deleteMany({})
+
+  // seed
+  console.log('start seeding...')
   await prisma.$transaction(async (prisma) => {
     for (const kampusData of kampusSeed) {
       await prisma.kampus.create({ data: kampusData })
@@ -97,6 +122,26 @@ async function main() {
     }
     for (const subunitData of subunitSeed) {
       await prisma.subunit.create({ data: subunitData })
+    }
+    const newKampus = await prisma.kampus.findFirst({})
+    const newUnit = await prisma.unit.findFirst({})
+
+    if (!!newKampus && !!newUnit) {
+      await prisma.users.create({
+        data: {
+          name: 'Super Admin',
+          email: 'superadmin@mailinator.com',
+          password: 'asdzxc',
+          nip: 'A1',
+          role: USER_ROLES.SUPERADMIN,
+          position: POSITIONS.STAFF,
+          kampusId: newKampus.id,
+          unitId: newUnit.id,
+          gender: 'Pria',
+          whitelist: false,
+          descriptors: [{}],
+        },
+      })
     }
   })
 

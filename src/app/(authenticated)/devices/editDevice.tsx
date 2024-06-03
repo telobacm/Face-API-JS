@@ -17,6 +17,7 @@ export default function EditDevice({ data, prop }: any) {
       const { mac, kampus, unit } = e.target
 
       const payload: any = {
+        id: data.id,
         mac: mac.value,
         kampus: { connect: { id: parseInt(kampus.value) } },
         unit: { connect: { id: parseInt(unit.value) } },
@@ -46,6 +47,7 @@ export default function EditDevice({ data, prop }: any) {
             required
             name="kampus"
             className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+            defaultValue={data.kampusId}
           >
             <option value="" disabled selected hidden className="text-gray-400">
               Pilih Kampus
@@ -67,6 +69,7 @@ export default function EditDevice({ data, prop }: any) {
             name="unit"
             // onChange={(e) => unitChange(e.target.value)}
             className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+            defaultValue={data.unitId}
           >
             <option value="" disabled selected hidden className="text-gray-400">
               Pilih Unit

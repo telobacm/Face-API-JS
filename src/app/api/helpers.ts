@@ -2,9 +2,6 @@ import { Prisma, Users } from '@prisma/client'
 import dayjs from 'dayjs'
 import { NextResponse } from 'next/server'
 
-const timeDifference = ({ time1, time2 }: any) =>
-  dayjs(time1).diff(dayjs(time2), 'hours')
-
 export const countEnterPunctuality = (
   user: Users,
   data: Prisma.ReportsUncheckedCreateInput,
@@ -29,6 +26,7 @@ export const countEnterPunctuality = (
     }
   }
   if (user?.position === 'SATPAM') {
+    console.log('yang presensi SATPAM')
     const shift1Entry = new Date()
     shift1Entry.setHours(6)
     shift1Entry.setMinutes(0)
@@ -85,7 +83,7 @@ export const countEnterPunctuality = (
       dayjs(body.timestamp) <= dayjs(shift3Entry)
     ) {
       console.log('if satpam 5')
-      data.isPunctual = 'Terlambat'
+      data.isPunctual = 'Tepat Waktu'
       data.shiftSatpam = 'Shift Malam'
     } else if (body.timestamp > shift3Entry) {
       console.log('if satpam 6')
