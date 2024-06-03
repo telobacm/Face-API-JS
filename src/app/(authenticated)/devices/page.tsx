@@ -32,6 +32,11 @@ export default function Devices() {
 
   const columnDefWithCheckBox = () => [
     {
+      accessorKey: 'no',
+      header: 'No.',
+      cell: ({ row }: any) => <span>{row?.index + 1}</span>,
+    },
+    {
       accessorKey: 'mac',
       header: 'Mac Address',
     },
@@ -125,6 +130,7 @@ export default function Devices() {
           title={'Device'}
           data={devices}
           showNotFound={showNotFound}
+          showSearchBar={true}
         />
       </AdminLayout>
     )

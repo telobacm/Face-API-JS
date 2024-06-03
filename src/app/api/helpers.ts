@@ -1,6 +1,5 @@
 import { Prisma, Users } from '@prisma/client'
 import dayjs from 'dayjs'
-import { NextResponse } from 'next/server'
 
 export const countEnterPunctuality = (
   user: Users,
@@ -103,6 +102,7 @@ export const countExitAllowance = (
     dayjs(lastReport.timestamp),
     'hours',
   )
+  //BUG: log ini jalan, tapi nggak sampe log berikutnya, data enterExit belum masuk sudah dijalankan
   console.log('Presensi Pulang')
 
   if (timeDifference < 6) {
@@ -113,7 +113,7 @@ export const countExitAllowance = (
     //Dianggap tidak presensi keluar sebelumnya, alihkan jadi masuk.
     countEnterPunctuality(user, data, body)
   } else if (timeDifference > 6 && timeDifference < 18) {
-    // console.log('ini menjalankan POST report Pulang')
+    console.log('ini menjalankan POST report Pulang')
     data.enterExit = 'Pulang'
   }
 }

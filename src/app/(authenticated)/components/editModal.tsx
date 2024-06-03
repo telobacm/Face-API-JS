@@ -2,7 +2,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import React, { useCallback, useState } from 'react'
 import { AiOutlineClose } from 'react-icons/ai'
-import { BiAddToQueue, BiPencil } from 'react-icons/bi'
+import { BiAddToQueue, BiPencil, BiSolidUserDetail } from 'react-icons/bi'
 import UploadImage from '~/components/uploadImage'
 
 export default function EditModal({
@@ -48,6 +48,11 @@ export default function EditModal({
               Add {detail}
             </button>
           ) : (
+            // : isUser ? (
+            //   <button className="text-lg mx-auto inline-flex justify-center w-fit p-2.5 -m-2 rounded-lg hover:bg-yellow-300 text-black hover:font-bold hover:text-gray-700">
+            //     <BiSolidUserDetail />
+            //   </button>
+            // )
             <button className="text-lg mx-auto inline-flex justify-center w-fit p-2.5 -m-2 rounded-lg hover:bg-yellow-300 text-black hover:font-bold hover:text-gray-700">
               <BiPencil />
             </button>

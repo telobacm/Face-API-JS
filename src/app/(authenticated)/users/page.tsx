@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react'
 import { BiSolidUserDetail } from 'react-icons/bi'
 import { Tooltip } from '@nextui-org/react'
 import { toast } from 'react-toastify'
+import EditUser from './editUser'
 
 export default function Users(session: any) {
   useEffect(() => {
@@ -35,11 +36,13 @@ export default function Users(session: any) {
 
   const columnDefWithCheckBox = () => [
     {
+      accessorKey: 'no',
+      header: 'No.',
+      cell: ({ row }: any) => <span>{row?.index + 1}</span>,
+    },
+    {
       accessorKey: 'name',
       header: 'Nama',
-      cell: ({ row }: any) => (
-        <Link href={`users/${row?.original?.id}`}>{row?.original?.name}</Link>
-      ),
     },
     {
       accessorKey: 'nip',
@@ -58,28 +61,39 @@ export default function Users(session: any) {
     {
       accessorKey: 'position',
       header: 'Jabatan',
+      cell: ({ row }: any) => (
+        <span>
+          {row?.original?.position?.charAt(0) +
+            row?.original?.position?.slice(1).toLowerCase()}
+        </span>
+      ),
     },
     {
       accessorKey: 'role',
       header: 'Role',
+      cell: ({ row }: any) => (
+        <span>
+          {row?.original?.role?.charAt(0) +
+            row?.original?.role?.slice(1).toLowerCase()}
+        </span>
+      ),
     },
     {
-      accessorKey: 'password',
-      header: 'Password',
+      accessorKey: 'whitelist',
+      header: 'Whitelist',
+      cell: ({ row }: any) => (
+        <div className="flex justify-center">
+          <span>{row?.original?.whitelist ? '✅' : '❌'}</span>
+        </div>
+      ),
     },
     {
       accessorKey: 'action',
       header: 'Action',
       cell: ({ row }: any) => (
-        // <Tooltip content="detail" color="secondary">
         <div className="flex justify-center">
-          <Link href={`users/${row?.original?.id}`}>
-            <div className="w-fit p-2.5 -m-2 rounded-lg hover:bg-blue-400 text-black hover:text-blue-100">
-              <BiSolidUserDetail />
-            </div>
-          </Link>
+          <EditUser data={row?.original} />
         </div>
-        // </Tooltip>
       ),
     },
   ]
@@ -115,6 +129,7 @@ export default function Users(session: any) {
           title={'User'}
           data={userList}
           showNotFound={showNotFound}
+          showSearchBar={true}
         />
       </AdminLayout>
     )

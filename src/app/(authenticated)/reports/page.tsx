@@ -35,8 +35,7 @@ export default function Reports() {
         },
       },
     },
-    //NOTE: selesaikan sort by date descendant
-    // sort: { timestamp: 'desc' },
+    sort: '-timestamp',
   }
 
   const {
@@ -46,6 +45,11 @@ export default function Reports() {
   } = useGetList('reports', filtered)
 
   const columnDefWithCheckBox = () => [
+    {
+      accessorKey: 'no',
+      header: 'No.',
+      cell: ({ row }: any) => <span>{row?.index + 1}</span>,
+    },
     {
       accessorKey: 'user.name',
       header: 'Nama',
@@ -98,7 +102,9 @@ export default function Reports() {
       accessorKey: 'isPunctual',
       header: 'Tepat Waktu',
       cell: ({ row }: any) => (
-        <span>{row?.original?.isPunctual === 'Tepat Waktu' ? '✅' : '❌'}</span>
+        <span className="pl-3">
+          {row?.original?.isPunctual === 'Tepat Waktu' ? '✅' : '❌'}
+        </span>
       ),
     },
     {
@@ -134,11 +140,11 @@ export default function Reports() {
     status == 'authenticated' && (
       <AdminLayout sidebar={true} header={true}>
         <div className="flex justify-end gap-6">
-          <PieChart
+          {/* <PieChart
             data={tableData}
             counted="ekspresi"
             label="Chart Ekspresi"
-          />
+          /> */}
         </div>
         <Table
           searchValueProps={[searchValue, setSearchValue]}
@@ -147,6 +153,7 @@ export default function Reports() {
           title={'Report'}
           data={tableData}
           showNotFound={showNotFound}
+          showSearchBar={true}
         />
       </AdminLayout>
     )

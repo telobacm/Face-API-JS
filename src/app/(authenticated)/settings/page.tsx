@@ -34,7 +34,7 @@ export default function Setting() {
   const { mutateAsync: updatePassword, error: errorUpdatePass }: any =
     usePatch('users/password')
 
-  const [isEdit, setisEdit] = useState(true)
+  const [isEdit, setisEdit] = useState(false)
 
   const [showPass, setShowPass] = useState({
     oldPass: false,

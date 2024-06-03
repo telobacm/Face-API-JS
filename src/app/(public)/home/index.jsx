@@ -257,6 +257,7 @@ function Root() {
   }
 
   const uploadReport = async (now, userData, expression, myFile) => {
+    const device = thisDevice?.deviceInfo
     try {
       const payload = {
         timestamp: now,
@@ -267,8 +268,18 @@ function Root() {
       Object.keys(payload).forEach((key) => {
         formData.append(key, payload[key])
       })
-      // BUG: upload image error
+      // Hentikan proses di sini jika kampusId atau unitId tidak cocok
+      if (
+        userData?.kampusId !== device?.kampusId ||
+        userData?.unitId !== device?.unitId
+      ) {
+        // jika tidak whitelist maka proses dihentikan, jika whitelist maka tetap lanjut
+        if (!userData?.whitelist) {
+          throw new Error('Presensi gagal. Anda tidak terdaftar di unit ini.')
+        }
+      }
       const res = await postReport(payload)
+      // BUG: upload image error
       if (res?.id) {
         setEnterExit(res?.enterExit)
         setIsPunctual(res?.isPunctual)
@@ -280,10 +291,10 @@ function Root() {
       // BUG: toast nggak muncul, padahal di tempat lain bentuknya sama gini
       toast.success('Presensi Sukses!')
     } catch (error) {
-      console.log('error message', error?.response?.data?.message)
-      console.log('type message', typeof error?.response?.data?.message)
-      setErrMessage(error?.response?.data?.message)
-      toast.error(error?.response?.data?.message)
+      // console.log('error message', error?.response?.data?.message)
+      // console.log('type message', typeof error?.response?.data?.message)
+      setErrMessage(error?.response?.data?.message || error.message)
+      toast.error(error?.response?.data?.message || error.message)
     }
   }
 

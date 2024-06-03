@@ -132,7 +132,7 @@ export default function Page() {
                 <tr>
                   <th className="px-2 py-3 lg:p-5 w-1/12">No</th>
                   <th className="px-2 py-3 lg:p-5 w-1/12">id</th>
-                  <th className="px-2 py-3 lg:p-5 w-1/12">position</th>
+                  <th className="px-2 py-3 lg:p-5 w-1/12">Jabatan</th>
                   <th className="px-2 py-3 lg:p-5 w-full">Name</th>
                   <th className="px-2 py-3 lg:p-5 w-1/12">Action</th>
                 </tr>

@@ -128,3 +128,64 @@ a[href*="utm_campaign=free-widget"][target="_blank"].eapps-link{
 ::-webkit-scrollbar-thumb {
   @apply bg-primary rounded-full
 }
+
+/* custom checkbox */
+
+/* The container */
+.container-checkbox {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.container-checkbox input {
+  @apply absolute opacity-0 cursor-pointer h-0 w-0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  @apply absolute top-0 left-0 h-8 w-8 border-2  border-gray-400 rounded-md;
+}
+
+/* On mouse-over, add a grey background color */
+.container-checkbox:hover input ~ .checkmark {
+  @apply border-blue-500
+}
+
+/* When the checkbox is checked, add a blue background */
+.container-checkbox input:checked ~ .checkmark {
+  @apply bg-blue-500;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: '';
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.container-checkbox input:checked ~ .checkmark:after {
+  @apply block;
+}
+
+/* Style the checkmark/indicator */
+.container-checkbox .checkmark:after {
+  left: 12px;
+  top: 6px;
+  width: 7px;
+  height: 14px;
+  border: solid white;
+  border-width: 0 4px 4px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
