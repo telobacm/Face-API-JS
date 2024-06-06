@@ -24,6 +24,8 @@
     "@tanstack/react-table": "^8.13.2",
     "@tinymce/tinymce-react": "^4.3.0",
     "axios": "^1.4.0",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "date-fns": "^3.6.0",
     "dayjs": "^1.11.10",
     "debounce": "^2.0.0",
     "eslint": "^8.57.0",

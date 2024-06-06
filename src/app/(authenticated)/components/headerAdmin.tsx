@@ -44,31 +44,33 @@ export default function HeaderAdmin(props: {
             </h1>
           </Link>
         </div>
-        <div className="flex justify-end gap-6 w-full items-end 2xsm:gap-7">
+        <div className="flex justify-between gap-6 w-full items-end 2xsm:gap-7">
+          {role === 'Admin Unit' ? (
+            <div className="flex items-center gap-4">
+              <div className="flex flex-col text-white md:text-black">
+                <div>
+                  Kampus:{' '}
+                  <span className="font-medium">
+                    {session?.user?.kampusLabel}
+                  </span>
+                </div>
+                <div>
+                  Unit:{' '}
+                  <span className="font-medium">
+                    {session?.user?.unitLabel}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div />
+          )}
           <div className="flex items-center gap-4">
             <div className="flex flex-col text-white md:text-black">
               <div>{session?.user?.name || session?.user?.email}</div>
               <div className="text-sm text-gray-500">{role}</div>
             </div>
           </div>
-          {role === 'Admin Unit' && (
-            <div className="flex items-center gap-4">
-              <div className="flex flex-col text-sm text-white md:text-black">
-                <div>
-                  Kampus:{' '}
-                  <span className="font-semibold">
-                    {session?.user?.kampusLabel}
-                  </span>
-                </div>
-                <div>
-                  Unit:{' '}
-                  <span className="font-semibold">
-                    {session?.user?.unitLabel}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </header>

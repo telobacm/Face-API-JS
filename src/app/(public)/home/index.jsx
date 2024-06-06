@@ -20,6 +20,7 @@ function Root() {
   const [isPunctual, setIsPunctual] = useState()
   const [ekspresi, setEkspresi] = useState()
   const [errMessage, setErrMessage] = useState()
+  const [successMessage, setSuccessMessage] = useState()
   const [faceMatcher, setFaceMatcher] = useState(null)
   const capturedPhotoRef = useRef()
   const webcamRef = useRef()
@@ -31,8 +32,7 @@ function Root() {
   const { mutateAsync: postReport, error: errorPostReport } = usePost('reports')
   const { mutateAsync: uploadFile, error: errorUploadFile } = usePost('upload')
 
-  // console.log('thisDevice', thisDevice?.deviceInfo)
-  dayjs.extend(relativeTime)
+  // dayjs.extend(relativeTime)
   useEffect(() => {
     const setupFaceRecognition = async () => {
       if (isSuccessUsers) {
@@ -88,6 +88,7 @@ function Root() {
     setIsPunctual(null)
     setEkspresi(null)
     setErrMessage(null)
+    setSuccessMessage(null)
   }
 
   const handleOff = async () => {
@@ -218,9 +219,6 @@ function Root() {
         setEntryTime(time)
         if (userData.id) {
           await takePhoto(now, userData, expression)
-          setCamOn(false)
-          stopVideo()
-          await uploadReport(now, userData, expression)
         }
       }
     } catch (error) {
@@ -239,11 +237,15 @@ function Root() {
 
       const context = canvas.getContext('2d')
       context.drawImage(video, 0, 0, canvas.width, canvas.height)
+      //LANGSUNG MATIKAN KAMERA SETELAH DAPAT GAMBAR, PROSES DILANJUT SETELAH STOP KAMERA
+      setCamOn(false)
+      stopVideo()
       canvas.toBlob((blob) => {
         console.log(blob)
         if (blob) {
           const imageUrl = URL.createObjectURL(blob)
           const myFile = new File([blob], 'photo', { type: 'image/png' })
+          // PROSES UPLOAD REPORT SEKALIAN SETELAH DAPAT FOTO
           uploadReport(now, userData, expression, myFile)
           // Set the Blob URL as the src for local preview
           capturedPhotoRef.current = {}
@@ -259,42 +261,37 @@ function Root() {
   const uploadReport = async (now, userData, expression, myFile) => {
     const device = thisDevice?.deviceInfo
     try {
+      // HENTIKAN PROSES DI SINI JIKA kampusId ATAU unitId USER TIDAK COCOK DENGAN MESIN PRESENSI
+      if (
+        userData?.kampusId !== device?.kampusId ||
+        userData?.unitId !== device?.unitId
+      ) {
+        // JIKA USER BUKAN WHITELIST MAKA PROSES DIHENTIKAN, JIKA WHITELIST MAKA TETAP LANJUT
+        if (!userData?.whitelist) {
+          throw new Error('Presensi gagal. Anda tidak terdaftar di unit ini.')
+        }
+      }
       const payload = {
         timestamp: now,
         ekspresi: expression,
         userId: userData?.id,
       }
-      const formData = new FormData()
-      Object.keys(payload).forEach((key) => {
-        formData.append(key, payload[key])
-      })
-      // Hentikan proses di sini jika kampusId atau unitId tidak cocok
-      if (
-        userData?.kampusId !== device?.kampusId ||
-        userData?.unitId !== device?.unitId
-      ) {
-        // jika tidak whitelist maka proses dihentikan, jika whitelist maka tetap lanjut
-        if (!userData?.whitelist) {
-          throw new Error('Presensi gagal. Anda tidak terdaftar di unit ini.')
-        }
-      }
       const res = await postReport(payload)
-      // BUG: upload image error
       if (res?.id) {
         setEnterExit(res?.enterExit)
         setIsPunctual(res?.isPunctual)
-        // const formData = new FormData()
-        // formData.append('file', myFile)
-        // formData.append('reportId', res.id)
-        // await uploadFile(formData)
+        const formData = new FormData()
+        formData.append('file', myFile)
+        formData.append('reportId', res.id)
+        await uploadFile(formData)
       }
-      // BUG: toast nggak muncul, padahal di tempat lain bentuknya sama gini
       toast.success('Presensi Sukses!')
+      setSuccessMessage('Presensi Sukses!')
     } catch (error) {
-      // console.log('error message', error?.response?.data?.message)
-      // console.log('type message', typeof error?.response?.data?.message)
-      setErrMessage(error?.response?.data?.message || error.message)
-      toast.error(error?.response?.data?.message || error.message)
+      const errMsg = error?.response?.data?.message || error.message
+      console.log(errMessage)
+      setErrMessage(errMsg)
+      toast.error(errMsg)
     }
   }
 
@@ -325,11 +322,25 @@ function Root() {
         )}
         {!camOn && !!reportOn && (
           <div className="grid justify-items-center">
-            {!!errMessage && (
-              <div className="flex items-center bg-red-400 w-fit h-fit mt-16">
-                <div className="bg-red-600 h-10 w-2.5" />
-                <p className="text-xl font-normal px-5">{errMessage}</p>
+            {/* PESAN ERROR ATAU SUKSES PRESENSI */}
+            {!!errMessage ? (
+              <div className={`flex items-center bg-red-400 w-fit h-fit mt-16`}>
+                <div className={`bg-red-600 h-10 w-2.5`} />
+                <p className="text-xl font-normal px-5">
+                  {errMessage || successMessage}
+                </p>
               </div>
+            ) : (
+              !!successMessage && (
+                <div
+                  className={`flex items-center bg-green-300 w-fit h-fit mt-16`}
+                >
+                  <div className={`bg-green-500 h-10 w-2.5`} />
+                  <p className="text-xl font-normal px-5">
+                    {errMessage || successMessage}
+                  </p>
+                </div>
+              )
             )}
             <div name="report-div" className="flex items-center">
               <img src={foto} alt="ini foto" />

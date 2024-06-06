@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { useGetList } from '~/services/dashboard'
-import NotFoundComponent from '~/components/NotFound'
 import Loading from '~/components/loading'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -36,6 +35,7 @@ export default function UserReport(props: any) {
     include: {
       reports: true,
     },
+    sort: { reports: '-timestamp' },
   }
   const {
     data: tableData,
@@ -108,59 +108,59 @@ export default function UserReport(props: any) {
           </Link>
         )}
         {tableData && (
-          <div className="flex justify-between">
-            <div className="flex-auto grid gap-2">
+          <div className="grid md:flex justify-between gap-4">
+            <div className="flex-auto grid content-start gap-2">
               <div className="text-2xl font-semibold text-black mb-2">
                 User Report
               </div>
               <div className="grid grid-cols-12">
-                <div className="col-span-1">Name</div>
-                <div className="col-span-11 font-semibold">
+                <div className="col-span-2 2xl:col-span-1">Name</div>
+                <div className="col-span-10 2xl:col-span-11 font-semibold">
                   : {tableData?.name}
                 </div>
               </div>
               <div className="grid grid-cols-12">
-                <div className="col-span-1">Email</div>
-                <div className="col-span-11 font-semibold">
+                <div className="col-span-2 2xl:col-span-1">Email</div>
+                <div className="col-span-10 2xl:col-span-11 font-semibold">
                   : {tableData?.email}
                 </div>
               </div>
               <div className="grid grid-cols-12">
-                <div className="col-span-1">NIP</div>
-                <div className="col-span-11 font-semibold">
+                <div className="col-span-2 2xl:col-span-1">NIP</div>
+                <div className="col-span-10 2xl:col-span-11 font-semibold">
                   : {tableData?.nip}
                 </div>
               </div>
               <div className="grid grid-cols-12">
-                <div className="col-span-1">Gender</div>
-                <div className="col-span-11 font-semibold">
+                <div className="col-span-2 2xl:col-span-1">Gender</div>
+                <div className="col-span-10 2xl:col-span-11 font-semibold">
                   : {tableData?.gender}
                 </div>
               </div>
               <div className="grid grid-cols-12">
-                <div className="col-span-1">Jabatan</div>
-                <div className="col-span-11 font-semibold">
+                <div className="col-span-2 2xl:col-span-1">Jabatan</div>
+                <div className="col-span-10 2xl:col-span-11 font-semibold">
                   :{' '}
                   {tableData?.position.charAt(0) +
                     tableData?.position.slice(1).toLowerCase()}
                 </div>
               </div>
               <div className="grid grid-cols-12">
-                <div className="col-span-1">Kampus</div>
-                <div className="col-span-11 font-semibold">
+                <div className="col-span-2 2xl:col-span-1">Kampus</div>
+                <div className="col-span-10 2xl:col-span-11 font-semibold">
                   : {tableData?.kampus?.name}
                 </div>
               </div>
               <div className="grid grid-cols-12">
-                <div className="col-span-1">Unit</div>
-                <div className="col-span-11 font-semibold">
+                <div className="col-span-2 2xl:col-span-1">Unit</div>
+                <div className="col-span-10 2xl:col-span-11 font-semibold">
                   : {tableData?.unit?.name}
                 </div>
               </div>
               {!!tableData?.subunit?.length && (
                 <div className="grid grid-cols-12">
-                  <div className="col-span-1">SubUnit</div>
-                  <div className="col-span-11 font-semibold">
+                  <div className="col-span-2 2xl:col-span-1">SubUnit</div>
+                  <div className="col-span-10 2xl:col-span-11 font-semibold">
                     : {tableData?.subunit?.name}
                   </div>
                 </div>

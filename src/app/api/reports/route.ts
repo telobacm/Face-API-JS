@@ -1,13 +1,72 @@
+import * as qs from 'qs'
 import { NextRequest, NextResponse } from 'next/server'
-import { LIST } from '~/app/api/crud'
 // import { prisma } from '~/../prisma/client static'
 import { Prisma } from '@prisma/client'
 import { prisma } from '~/../prisma/client'
 import dayjs from 'dayjs'
 import { countEnterPunctuality, countExitAllowance } from '../helpers'
-import { HandleError } from '~/helpers/server'
+import {
+  HandleError,
+  formatIncludeOrSelect,
+  parseFilter,
+  parseSort,
+} from '~/helpers/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '../auth/[...nextauth]/route'
 
-export const GET = LIST
+export const GET = async (req: NextRequest) => {
+  try {
+    const session: any = await getServerSession(authOptions)
+    const user = session?.user
+
+    const table = req.nextUrl.pathname.split('/')[2]
+    const url = new URL(req.url).search.substring(1)
+    const {
+      sort,
+      part,
+      limit,
+      count,
+      include = {},
+      // ...query
+      filter = {}, // Destructure filter directly
+    }: any = qs.parse(url)
+
+    // const where = await parseFilter(filter)
+    const where = await parseFilter(filter)
+    const orderBy = parseSort(sort)
+
+    formatIncludeOrSelect(include)
+    const params: any = { where, orderBy, include }
+
+    if (part && limit) {
+      params.skip = (parseInt(part) - 1) * parseInt(limit)
+      params.take = parseInt(limit)
+    }
+
+    // Adjust query based on user role
+    if (user?.role === 'ADMIN') {
+      params.where = {
+        ...params.where,
+        user: {
+          kampusId: user?.kampusId,
+          unitId: user?.unitId,
+        },
+      }
+    }
+    let result = {}
+
+    if (count) {
+      const total = await prisma[table].count({ where: params.where })
+      result = { total }
+    } else {
+      result = await prisma[table].findMany(params)
+    }
+
+    return NextResponse.json(result)
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}
 
 export const POST = async (req: NextRequest, { params }: any) => {
   try {

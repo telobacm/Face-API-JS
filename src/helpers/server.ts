@@ -248,6 +248,41 @@ export function removeQueryString(str: string) {
   return str
 }
 
+// export const handleProcessFile = async (file: any, oldFile: any) => {
+//   if (file) {
+//     const fileExtension = path.extname(file.name).toLowerCase()
+//     const isGifOrWebM = ['.gif', '.webm'].includes(fileExtension)
+
+//     const publicPath = isGifOrWebM
+//       ? path.resolve('./public/videos')
+//       : path.resolve('./public/images')
+//     let name = ''
+
+// if (oldFile) {
+//   name = getFileName(oldFile)
+//   const isVideo = ['.mp4', '.webm', '.gif'].some((ext) =>
+//     oldFile.includes(ext),
+//   )
+
+//   const targetPath = isVideo
+//     ? path.resolve('./public/videos')
+//     : path.resolve('./public/images')
+
+//   await unlink(path.join(targetPath, oldFile))
+// }
+// else {
+//   name = uuidv4()
+// }
+//     const newFileName = `${name}${fileExtension}`
+//     const bytes = await file.arrayBuffer()
+//     const buffer = Buffer.from(bytes)
+
+//     return { fileName: newFileName, buffer, pathTo: publicPath }
+//   }
+
+//   return { fileName: null, buffer: null, pathTo: null }
+// }
+
 export const handleProcessFile = async (file: any, oldFile: any) => {
   if (file) {
     const fileExtension = path.extname(file.name).toLowerCase()
@@ -256,24 +291,11 @@ export const handleProcessFile = async (file: any, oldFile: any) => {
     const publicPath = isGifOrWebM
       ? path.resolve('./public/videos')
       : path.resolve('./public/images')
-    let name = ''
 
-    // if (oldFile) {
-    //   name = getFileName(oldFile)
-    //   const isVideo = ['.mp4', '.webm', '.gif'].some((ext) =>
-    //     oldFile.includes(ext),
-    //   )
+    // Generate a unique name for the file
+    const uniqueName = uuidv4()
+    const newFileName = `${uniqueName}${fileExtension}`
 
-    //   const targetPath = isVideo
-    //     ? path.resolve('./public/videos')
-    //     : path.resolve('./public/images')
-
-    //   await unlink(path.join(targetPath, oldFile))
-    // }
-    // else {
-    //   name = uuidv4()
-    // }
-    const newFileName = `${name}${fileExtension}`
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 

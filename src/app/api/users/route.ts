@@ -9,6 +9,8 @@ import {
   parseSort,
 } from '~/helpers/server'
 import { prisma } from '~/../prisma/client'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '../auth/[...nextauth]/route'
 
 export const POST = async (req: NextRequest, { params }: any) => {
   try {
@@ -55,6 +57,9 @@ export const POST = async (req: NextRequest, { params }: any) => {
 
 export const GET = async (req: NextRequest) => {
   try {
+    const session: any = await getServerSession(authOptions)
+    const user = session?.user
+
     const table = req.nextUrl.pathname.split('/')[2]
     const url = new URL(req.url).search.substring(1)
     const {
@@ -91,6 +96,15 @@ export const GET = async (req: NextRequest) => {
         },
         ...include,
       },
+    }
+
+    // Adjust query based on user role
+    if (user?.role === 'ADMIN') {
+      params.where = {
+        ...params.where,
+        kampusId: user?.kampusId,
+        unitId: user?.unitId,
+      }
     }
 
     if (part && limit) {

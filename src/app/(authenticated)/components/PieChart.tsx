@@ -1,8 +1,8 @@
-// PieChart.tsx
 import React from 'react'
 import { Pie } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-ChartJS.register(ArcElement, Tooltip, Legend)
+import ChartDataLabels from 'chartjs-plugin-datalabels'
+ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels)
 
 const transformData = (reports: any[], counted: string) => {
   const counts = reports.reduce((acc: any, report: any) => {
@@ -21,21 +21,24 @@ const transformData = (reports: any[], counted: string) => {
 const prepareChartData = (counts: { [key: string]: number }) => {
   const labels = Object.keys(counts)
   const data = Object.values(counts)
+  const total = data.reduce((acc, val) => acc + val, 0)
+
+  // const percentages = data.map((val) => ((val / total) * 100).toFixed(2) + '%')
 
   return {
     labels,
     datasets: [
       {
-        label: 'jumlah',
-        data,
+        label: 'count',
+        data: data,
         backgroundColor: [
           '#FF6384',
           '#36A2EB',
-          '#FFCE56',
+          '#0AAD6C',
           '#FF6347',
           '#8A2BE2',
-          '#3CB371',
-          '#FFA500',
+          '#7678ed',
+          '#ff7d00',
         ],
       },
     ],
@@ -55,9 +58,38 @@ const PieChart = ({
   const chartData = prepareChartData(counts)
 
   return (
-    <div className="grid gap-1 h-64">
+    <div className="grid gap-1 w-96">
       <p className="text-lg font font-semibold">{label}</p>
-      <Pie data={chartData} />
+      <Pie
+        data={chartData}
+        options={{
+          height: '16rem',
+          plugins: {
+            datalabels: {
+              color: '#f8ffdb',
+              labels: {
+                value: {
+                  font: {
+                    weight: 'bold',
+                  },
+                },
+              },
+              formatter: (value: any, ctx: any) => {
+                const percentage =
+                  (
+                    (value /
+                      ctx.chart.data.datasets[0].data.reduce(
+                        (a: any, b: any) => a + b,
+                        0,
+                      )) *
+                    100
+                  ).toFixed(2) + '%'
+                return percentage
+              },
+            },
+          },
+        }}
+      />
     </div>
   )
 }

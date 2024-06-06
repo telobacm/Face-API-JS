@@ -4,7 +4,7 @@ import type { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '~/../prisma/client'
 
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     // GoogleProvider({
     //   clientId: process.env.GOOGLE_CLIENT_ID,
@@ -48,7 +48,7 @@ const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     maxAge: 3 * 24 * 60 * 60, // 3 days
-    // maxAge: 60 * 60, // 1 hoeurs
+    // maxAge: 60 * 60, // 1 hour
   },
   callbacks: {
     async session({ session, token }: any) {

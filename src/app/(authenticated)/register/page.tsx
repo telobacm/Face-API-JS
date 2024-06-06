@@ -18,16 +18,11 @@ const Register = () => {
   const role = sessionData?.user?.role
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login')
-    if (status === 'authenticated' && role == 'ADMIN') router.push('/reports')
     if (status === 'authenticated' && role == 'USER')
       router.push(`/reports/${sessionData?.user?.id}`)
   }, [status, router, role])
 
-  const {
-    data: kampus,
-    isLoading: isLoadingKampus,
-    isSuccess: isSuccessKampus,
-  } = useGetList('kampus')
+  const { data: kampus, isLoading: isLoadingKampus } = useGetList('kampus')
   const { data: units, isLoading: isLoadingUnits } = useGetList('unit')
   const { data: subUnitDosen, isLoading: isLoadingSubUnitDosen } = useGetList(
     'subunit',

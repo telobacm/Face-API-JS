@@ -4,26 +4,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { handleProcessFile } from '~/helpers/server'
 import { HandleError } from '~/helpers/server'
 import { existsSync } from 'fs'
-import { getServerSession } from 'next-auth'
 import { prisma } from '../../../../prisma/client static'
-
-// import authOptions from '../auth/[...nextauth]/authOptions'
+// import { prisma } from '../../../../prisma/client'
 
 export async function POST(request: NextRequest) {
   try {
-    // const session: any = await getServerSession(authOptions)
-    // if (session?.user?.active) {
     const data: any = await request.formData()
 
     const file: File | null = data.get('file') as unknown as File
-    //   const oldImage = data.get('oldImage')
-
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
     }
 
     const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg']
-
     if (!allowedImageTypes.includes(file.type)) {
       return NextResponse.json(
         { error: 'Tidak bisa upload selain image!' },
@@ -31,31 +24,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { fileName, buffer, pathTo }: any = await handleProcessFile(file, '')
-
-    // if (oldImage) {
-    //   const oldImagePath = path.join(pathTo, oldImage)
-
-    //   if (existsSync(oldImagePath)) {
-    //     await unlink(path.join(pathTo, oldImage))
-    //   }
-    // }
-
     const reportId = data.get('reportId')
-    if (file && reportId) {
-      await writeFile(path.join(pathTo, fileName), buffer)
-      const res = await prisma.reports.update({
-        where: { id: parseInt(reportId) },
-        data: { image: fileName },
-      })
-      return NextResponse.json(res)
+    if (!reportId) {
+      throw new Error('reportId tidak valid')
     }
 
-    throw new Error('reportId atau file tidak valid')
+    // Handle the file processing
+    const { fileName, buffer, pathTo } = await handleProcessFile(file, '')
 
-    // } else {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
+    if (!fileName || !buffer || !pathTo) {
+      throw new Error('File processing failed')
+    }
+
+    const filePath = path.join(pathTo, fileName)
+    await writeFile(filePath, buffer)
+
+    const res = await prisma.reports.update({
+      where: { id: parseInt(reportId) },
+      data: { image: fileName },
+    })
+
+    return NextResponse.json(res)
   } catch (error) {
     return HandleError(error)
   }

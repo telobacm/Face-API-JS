@@ -24,7 +24,6 @@ const Table = ({
   showNotFound,
   data,
   title,
-  showSearchBar,
 }: any) => {
   const [searchValue, setSearchValue] = searchValueProps
   const [currentPage, setCurrentPage] = currentPageProps
@@ -56,25 +55,20 @@ const Table = ({
           optionLanguage ? 'items-end' : ''
         } w-full gap-5 justify-between mt-5`}
       >
-        {!!showSearchBar && (
-          <div
-            className={`w-1/2 ${
-              optionLanguage ? 'flex items-end gap-2' : 'md:w-1/4'
-            }`}
-          >
-            <input
-              name="search"
-              type="search"
-              defaultValue={searchValue}
-              onChange={debounce(
-                (e: any) => setSearchValue(e.target.value),
-                700,
-              )}
-              placeholder={`Search ${title}`}
-              className="bg-gray-100 h-min border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 "
-            />
-          </div>
-        )}
+        <div
+          className={`w-1/2 ${
+            optionLanguage ? 'flex items-end gap-2' : 'md:w-1/4'
+          }`}
+        >
+          <input
+            name="search"
+            type="search"
+            defaultValue={searchValue}
+            onChange={debounce((e: any) => setSearchValue(e.target.value), 700)}
+            placeholder={`Search ${title}`}
+            className="bg-gray-100 h-min border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 "
+          />
+        </div>
 
         {handleAdd && (
           <button onClick={handleAdd} className="!leading-normal !h-10">
