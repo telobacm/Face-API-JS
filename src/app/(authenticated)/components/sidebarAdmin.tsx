@@ -148,10 +148,11 @@ export default function SidebarAdmin({
                       <Link
                         href={`${menu.href}`}
                         className={`group capitalize relative flex !items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-blue-200 hover:bg-opacity-30  ${
-                          '/' + pathname === `${menu.href}`
-                            ? 'bg-blue-300 bg-opacity-25'
+                          pathname === `${menu.href}`
+                            ? 'bg-sky-200 bg-opacity-50'
                             : ''
                         }`}
+                        onClick={() => console.log(menu.href)}
                       >
                         <div className="text-xl">{menu.icon}</div>
                         <div className="mt-1"> {menu.label}</div>
