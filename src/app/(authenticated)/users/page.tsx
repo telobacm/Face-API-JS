@@ -13,6 +13,23 @@ import { toast } from 'react-toastify'
 import EditUser from './editUser'
 
 export default function Users(session: any) {
+  const router = useRouter()
+  const { status, data }: any = useSession()
+  const role = data?.user?.role
+
+  useEffect(() => {
+    // console.log('status', status)
+
+    if (status !== 'loading') {
+      if (status === 'unauthenticated') {
+        router.push('/login')
+      }
+      if (status === 'authenticated' && role == 'USER') {
+        router.push('/settings')
+      }
+    }
+  }, [status, router, role])
+
   useEffect(() => {
     const toastMessage = sessionStorage.getItem('toastMessage')
     if (toastMessage) {
@@ -92,29 +109,13 @@ export default function Users(session: any) {
       header: 'Action',
       cell: ({ row }: any) => (
         <div className="flex justify-center">
-          <EditUser data={row?.original} />
+          <EditUser data={row?.original} role={role} />
         </div>
       ),
     },
   ]
 
   const showNotFound = isSuccess && !userList?.length
-
-  const router = useRouter()
-  const { status, data }: any = useSession()
-  const role = data?.user?.role
-  useEffect(() => {
-    // console.log('status', status)
-
-    if (status !== 'loading') {
-      if (status === 'unauthenticated') {
-        router.push('/login')
-      }
-      if (status === 'authenticated' && role == 'USER') {
-        router.push('/settings')
-      }
-    }
-  }, [status, router, role])
 
   if (isLoading) {
     return <Loading />

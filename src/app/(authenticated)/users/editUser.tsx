@@ -1,10 +1,11 @@
 'use client'
+import { useSession } from 'next-auth/react'
 import React, { useState } from 'react'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import EditModal from '~/app/(authenticated)/components/editModal'
 import { usePatch } from '~/services/dashboard'
 
-export default function EditUser({ data }: any) {
+export default function EditUser({ data, role }: any) {
   const [showPass, setShowPass] = useState(false)
   const { mutateAsync: edit } = usePatch('users')
 
@@ -95,36 +96,48 @@ export default function EditUser({ data }: any) {
           )}
         </span>
       </div>
-      <div className="flex items-center gap-1.5">
-        <label className="text-black">Role :</label>
-        <div className="relative">
-          <select
-            required
-            name="role"
-            className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-            defaultValue={data.role}
-          >
-            <option value="" disabled selected hidden className="text-gray-400">
-              Pilih Role
-            </option>
-            <option value="SUPERADMIN">Super Admin</option>
-            <option value="ADMIN">Admin</option>
-            <option value="USER">User</option>
-          </select>
+      {role === 'SUPERADMIN' ? (
+        <div>
+          <div className="flex items-center gap-1.5">
+            <label className="text-black">Role :</label>
+            <div className="relative">
+              <select
+                required
+                name="role"
+                className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                defaultValue={data.role}
+              >
+                <option
+                  value=""
+                  disabled
+                  selected
+                  hidden
+                  className="text-gray-400"
+                >
+                  Pilih Role
+                </option>
+                <option value="SUPERADMIN">Super Admin</option>
+                <option value="ADMIN">Admin</option>
+                <option value="USER">User</option>
+              </select>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="mt-4 text-black">Whitelist :</label>
+            <label className={`container-checkbox`}>
+              <input
+                type="checkbox"
+                defaultChecked={data.whitelist}
+                name="whitelist"
+                className="checkmark"
+              />
+              <span className="checkmark bg-gray-100" />
+            </label>
+          </div>
         </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <label className="mt-4 text-black">Whitelist :</label>
-        <label className={`container-checkbox`}>
-          <input
-            type="checkbox"
-            defaultChecked={data.whitelist}
-            name="whitelist"
-            className="checkmark"
-          />
-          <span className="checkmark bg-gray-100" />
-        </label>
-      </div>
+      ) : (
+        ''
+      )}
     </EditModal>
   )
 }

@@ -115,6 +115,10 @@ function Root() {
 
   // FUNGSI STOP WEBCAM
   const stopVideo = () => {
+    // if (countdownIntervalId) {
+    //   clearInterval(countdownIntervalId)
+    //   setCountdownIntervalId(null)
+    // }
     stopDetectMyFace()
     const stream = webcamRef?.current?.srcObject
     const tracks = stream?.getTracks()
@@ -154,17 +158,21 @@ function Root() {
     const id = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          // JIKA COUNTDOWN SUDAH 0 MATIKAN KAMERA
           clearInterval(id)
-          setCamOn(false)
-          stopVideo()
-          return 30 // Reset countdown
         }
         return prev - 1
       })
     }, 1000)
     setCountdownIntervalId(id)
   }
+
+  //JIKA COUNTDOWN HABIS DAN KAMERA MASIH ON, BELUM DIMATIKAN OTOMATIS KARENA PRESENSI, MAKA MATIKAN KAMERA
+  useEffect(() => {
+    if (countdown < 1 && !!camOn) {
+      setCamOn(false)
+      stopVideo()
+    }
+  }, [countdown])
 
   // FUNGSI DETEKSI WAJAH (FUNGSI UTAMA)
   const detectMyFace = () => {
@@ -279,7 +287,7 @@ function Root() {
 
         // CEK JIKA BLINK TIDAK VALID (LEBIH DARI 3 DETIK)
         // Masuk ke kondisi ini bisa dibilang mustahil karena detectBlink hanya dijalankan jika wajah terdeteksi adalah user terdaftar. Dan jika user terdaftar sudah blink maka akan dilanjut proses presensi ambil foto dan POST report.
-        if (now - blinkStartTime >= 3000 || blinkFrames * 100 >= 3000) {
+        if (blinkFrames * 100 >= 3000) {
           console.log('Invalid Blink: More than 3 seconds')
           setBlinkStartTime(null)
           setBlinkFrames(0)
@@ -289,7 +297,6 @@ function Root() {
         // RESET BLINK TRACKING (MEREM TERLALU LAMA) JIKA MATA TERBUKA
         setBlinkStartTime(null)
         setBlinkFrames(0)
-        console.log('ini melek lagi')
       }
     } catch (error) {
       console.log(error)
