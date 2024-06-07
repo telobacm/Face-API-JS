@@ -104,7 +104,7 @@ export default function Users(session: any) {
   const { status, data }: any = useSession()
   const role = data?.user?.role
   useEffect(() => {
-    console.log('status', status)
+    // console.log('status', status)
 
     if (status !== 'loading') {
       if (status === 'unauthenticated') {
@@ -126,7 +126,7 @@ export default function Users(session: any) {
           searchValueProps={[searchValue, setSearchValue]}
           currentPageProps={[currentPage, setCurrentPage]}
           finalColumnDef={columnDefWithCheckBox()}
-          title={'User'}
+          title={'user by name or nip'}
           data={userList}
           showNotFound={showNotFound}
           showSearchBar={true}

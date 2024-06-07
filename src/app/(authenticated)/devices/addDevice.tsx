@@ -31,10 +31,10 @@ export default function AddDevice({ prop }: any) {
   }
   return (
     <EditModal
-      title={`Add ${prop.charAt(0).toUpperCase() + prop.slice(1)}`}
+      title="Add Device"
       isAdd
       defaultAdd={true}
-      detail={prop.charAt(0).toUpperCase() + prop.slice(1)}
+      detail="Device"
       showImage={false}
       handleSubmit={handleSubmit}
     >

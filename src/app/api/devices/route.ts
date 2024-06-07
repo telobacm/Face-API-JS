@@ -10,7 +10,7 @@ import { prisma } from '~/../prisma/client'
 import { CREATE, LIST } from '~/app/api/crud'
 
 export const POST = CREATE
-// export const GET = LIST
+
 export const GET = async (req: NextRequest) => {
   try {
     const table = req.nextUrl.pathname.split('/')[2]
@@ -65,3 +65,62 @@ export const GET = async (req: NextRequest) => {
     return HandleError(error)
   }
 }
+
+// export const GET = async (req: NextRequest) => {
+//   try {
+//     const table = req.nextUrl.pathname.split('/')[2]
+//     const url = new URL(req.url).search.substring(1)
+//     const {
+//       sort,
+//       part,
+//       limit,
+//       count,
+//       include = {},
+//       ...query
+//     }: any = qs.parse(url)
+
+//     const where = await parseFilter(query?.filter)
+//     const orderBy = parseSort(sort)
+
+//     // Always include kampus.name and unit.name
+//     const defaultInclude = {
+//       kampus: {
+//         select: {
+//           name: true,
+//         },
+//       },
+//       unit: {
+//         select: {
+//           name: true,
+//         },
+//       },
+//     }
+
+//     const params: any = {
+//       where,
+//       orderBy,
+//       include: {
+//         ...defaultInclude,
+//         ...include,
+//       },
+//     }
+
+//     if (part && limit) {
+//       params.skip = (parseInt(part) - 1) * parseInt(limit)
+//       params.take = parseInt(limit)
+//     }
+
+//     let result: any = {}
+
+//     if (count) {
+//       const total = await prisma[table].count()
+//       result = { total }
+//     } else {
+//       result = await prisma[table].findMany(params)
+//     }
+
+//     return NextResponse.json(result)
+//   } catch (error: any) {
+//     return HandleError(error)
+//   }
+// }

@@ -16,14 +16,10 @@ const Clock = () => {
 
   const clock = dayjs(currentTime).format('HH:mm:ss')
 
-  // console.log('clock', typeof currentTime.locale('id').format('HH:mm:ss'))
-
   return (
     <div className="text-center">
       <p className="text-7xl font-bold">{clock}</p>
-      <p className="text-xl font-semibold">
-        {/* {currentTime.locale('id').format('dddd, DD MMMM YYYY')} */}
-      </p>
+      <p className="text-xl font-semibold"></p>
     </div>
   )
 }

@@ -13,7 +13,7 @@ import EditDevice from './editDevice'
 export default function Devices() {
   const [searchValue, setSearchValue] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const search_keys = 'kampus, unit'
+  const search_keys = 'kampus.name,unit.name'
   const filtered: any = {
     page: currentPage,
     filter: {
@@ -28,7 +28,7 @@ export default function Devices() {
     isSuccess,
   } = useGetList('devices', filtered)
   const { data: thisDevice } = useGetList('address')
-  console.log('thisDevice', thisDevice)
+  // console.log('thisDevice', thisDevice)
 
   const columnDefWithCheckBox = () => [
     {
@@ -61,7 +61,6 @@ export default function Devices() {
       ),
     },
   ]
-  console.log('isLoading', isLoading)
 
   const showNotFound = isSuccess && !devices?.length
 
@@ -127,7 +126,7 @@ export default function Devices() {
           searchValueProps={[searchValue, setSearchValue]}
           currentPageProps={[currentPage, setCurrentPage]}
           finalColumnDef={columnDefWithCheckBox()}
-          title={'Device'}
+          title={'device by kampus or unit'}
           data={devices}
           showNotFound={showNotFound}
           showSearchBar={true}

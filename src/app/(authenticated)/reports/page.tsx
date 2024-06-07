@@ -222,12 +222,12 @@ export default function Reports() {
     {
       accessorKey: 'image',
       header: 'Foto',
-      cell: ({ cell }: any) => (
+      cell: ({ row }: any) => (
         <div>
           <img
             className="w-48 h-36"
             loading="lazy"
-            src={`!!cell.getValue() ${process.env.NEXT_PUBLIC_API_URL}/images/${cell.getValue()}`}
+            src={`${process.env.NEXT_PUBLIC_API_URL}/images/${row?.original?.image}`}
             alt=""
           />
         </div>

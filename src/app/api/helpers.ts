@@ -25,7 +25,6 @@ export const countEnterPunctuality = (
     }
   }
   if (user?.position === 'SATPAM') {
-    console.log('yang presensi SATPAM')
     const shift1Entry = new Date()
     shift1Entry.setHours(6)
     shift1Entry.setMinutes(0)

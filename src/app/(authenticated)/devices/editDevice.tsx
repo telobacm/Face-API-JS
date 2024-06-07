@@ -9,8 +9,7 @@ export default function EditDevice({ data, prop }: any) {
   const { data: kampus, isLoading: isLoadingKampus } = useGetList('kampus')
   const { data: units, isLoading: isLoadingUnits } = useGetList('unit')
   const { mutateAsync: edit } = usePatch(prop)
-  console.log('data device', data)
-  console.log('id device', data.id)
+  // console.log('dataDevice', data.unitId)
 
   const handleSubmit = async (e: any) => {
     try {
@@ -47,7 +46,7 @@ export default function EditDevice({ data, prop }: any) {
             required
             name="kampus"
             className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-            defaultValue={data.kampusId}
+            defaultValue={data?.kampusId}
           >
             <option value="" disabled selected hidden className="text-gray-400">
               Pilih Kampus
@@ -67,16 +66,15 @@ export default function EditDevice({ data, prop }: any) {
           <select
             required
             name="unit"
-            // onChange={(e) => unitChange(e.target.value)}
             className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-            defaultValue={data.unitId}
+            defaultValue={data?.unitId}
           >
             <option value="" disabled selected hidden className="text-gray-400">
               Pilih Unit
             </option>
             {!!units?.length &&
               units?.map((x: any, i: number) => (
-                <option key={i} value={x.id + '/' + x.name}>
+                <option key={i} value={x.id}>
                   {x?.name}
                 </option>
               ))}

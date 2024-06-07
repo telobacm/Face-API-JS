@@ -63,7 +63,6 @@ const PieChart = ({
       <Pie
         data={chartData}
         options={{
-          height: '16rem',
           plugins: {
             datalabels: {
               color: '#f8ffdb',
