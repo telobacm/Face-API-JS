@@ -152,7 +152,6 @@ export default function SidebarAdmin({
                             ? 'bg-sky-200 bg-opacity-50'
                             : ''
                         }`}
-                        onClick={() => console.log(menu.href)}
                       >
                         <div className="text-xl">{menu.icon}</div>
                         <div className="mt-1"> {menu.label}</div>

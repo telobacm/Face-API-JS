@@ -183,10 +183,6 @@ export default function Reports() {
       cell: ({ row }: any) => <span>{row?.original?.user?.unit?.name}</span>,
     },
     {
-      accessorKey: 'enterExit',
-      header: 'Masuk/Pulang',
-    },
-    {
       accessorKey: 'timestamp-date',
       header: 'Tanggal',
       cell: ({ row }: any) => {
@@ -201,6 +197,10 @@ export default function Reports() {
         const hour = dayjs(row?.original?.timestamp)
         return hour.format('HH:mm:ss')
       },
+    },
+    {
+      accessorKey: 'enterExit',
+      header: 'Masuk/Pulang',
     },
     {
       accessorKey: 'isPunctual',
@@ -223,7 +223,7 @@ export default function Reports() {
       accessorKey: 'image',
       header: 'Foto',
       cell: ({ row }: any) => (
-        <div>
+        <div className="w-48">
           <img
             className="w-48 h-36"
             loading="lazy"
@@ -256,7 +256,7 @@ export default function Reports() {
       <AdminLayout sidebar={true} header={true}>
         <div className="grid lg:flex justify-between">
           {/* FILTERS */}
-          <div className="grid content-start gap-x-8 gap-y-6">
+          <div className="grid content-start gap-x-8 gap-y-6 flex-wrap">
             {/* FILTER UNIT */}
             {role === 'SUPERADMIN' ? (
               <div className="grid gap-1.5 content-start">

@@ -4,15 +4,17 @@ import { HandleError } from '~/helpers/server'
 
 export const GET = async () => {
   try {
-    const macList: string[] = []
+    const macSet = new Set<string>()
     const networkInterfaces = os.networkInterfaces()
     for (const [key, value] of Object.entries(networkInterfaces)) {
       value?.forEach((val: any) => {
         if (val.mac !== '00:00:00:00:00:00') {
-          macList.push(val.mac)
+          macSet.add(val.mac)
         }
       })
     }
+
+    const macList = Array.from(macSet)
 
     const deviceInfo = await prisma.devices.findFirst({
       where: {

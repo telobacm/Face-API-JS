@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+import { toast } from 'react-toastify'
 import EditModal from '~/app/(authenticated)/components/editModal'
 import FloatInput from '~/components/floatInput'
 import { usePatch } from '~/services/dashboard'
@@ -17,9 +18,13 @@ export default function EditUnit({ data, prop }: any) {
       if (prop === 'subunit') {
         payload.position = position.value
       }
-      await edit({ id: data.id, payload })
+      const res = await edit({ id: data.id, payload })
+      if (res.id) {
+        toast.success(`${prop} ${res.name} berhasil diedit`)
+      }
     } catch (error) {
       console.log(error)
+      toast.error(`Gagal mengedit ${prop}`)
     }
   }
   return (

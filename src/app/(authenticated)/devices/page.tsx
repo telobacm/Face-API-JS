@@ -79,31 +79,40 @@ export default function Devices() {
   return (
     status == 'authenticated' && (
       <AdminLayout sidebar={true} header={true}>
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-start gap-6">
           {!!thisDevice && (
-            <div className="grid text-normal">
+            <div className="grid text-normal gap-1.5">
               {!thisDevice?.deviceInfo?.id && (
                 <>
                   <div>
-                    Perangkat ini tidak terdaftar untuk mesin presensi, ingin
-                    anda daftarkan ?
+                    <p>
+                      Perangkat ini tidak terdaftar untuk mesin presensi, ingin
+                      anda daftarkan ?
+                    </p>
+                    <p>Pilih salah satu mac Address anda untuk didaftarkan</p>
                   </div>
-                  <div className="flex gap-2">
-                    mac adress:{' '}
+                  <div className="flex flex-wrap gap-2">
+                    Mac adress:{' '}
                     {thisDevice?.macList?.map((x: string, i: number) => (
                       <p key={i}>
                         <span className="font-semibold">{x}</span>
                         {i < thisDevice.macList.length - 1 && ','}
                       </p>
                     ))}
+                    {/* {Array(10)
+                      .fill(thisDevice?.macList)
+                      .map((x, i) => (
+                        <p key={i}>
+                          <span className="font-semibold">{x}</span>
+                          {i < thisDevice.macList.length - 1 && ','}
+                        </p>
+                      ))} */}
                   </div>
                 </>
               )}
               {!!thisDevice?.deviceInfo?.id && (
                 <>
-                  <div className="mb-1.5">
-                    Perangkat ini terdaftar untuk mesin presensi:
-                  </div>
+                  <div>Perangkat ini terdaftar untuk mesin presensi:</div>
                   <div className="">
                     Kampus:{' '}
                     <span className="font-semibold">

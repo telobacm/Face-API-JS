@@ -92,7 +92,7 @@ model Reports {
 
 model Devices {
   id       String @id @unique @default(cuid())
-  mac      String
+  mac      String @unique
   kampusId Int
   unitId   Int
   kampus   Kampus @relation(fields: [kampusId], references: [id])

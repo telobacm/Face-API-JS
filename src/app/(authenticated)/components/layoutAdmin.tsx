@@ -24,11 +24,15 @@ export default function AdminLayout({
   const role = session?.data?.user?.role
   // console.log('role', role)
 
-  return blacklist.includes(pathname) && role === 'USER' ? (
-    <NotFound />
-  ) : blacklistAdminUnit.includes(pathname) && role === 'ADMIN' ? (
-    <NotFound />
-  ) : (
+  if (
+    (blacklist.includes(pathname) && role === 'USER') ||
+    (blacklistAdminUnit.includes(pathname) && role === 'ADMIN') ||
+    (pathname === '/reports' && role === 'USER')
+  ) {
+    return <NotFound />
+  }
+
+  return (
     <div className="dark:bg-boxdark-2 dark:text-bodydark">
       <ToastContainer
         position="top-right"

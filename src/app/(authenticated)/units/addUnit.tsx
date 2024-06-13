@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+import { toast } from 'react-toastify'
 import EditModal from '~/app/(authenticated)/components/editModal'
 import FloatInput from '~/components/floatInput'
 import { usePost } from '~/services/dashboard'
@@ -17,9 +18,13 @@ export default function AddUnit({ prop }: any) {
       if (prop === 'subunit') {
         payload.position = position.value
       }
-      add(payload)
+      const res = await add(payload)
+      if (res.id) {
+        toast.success(`${prop} ${res.name} berhasil ditambahkan`)
+      }
     } catch (error) {
       console.log(error)
+      toast.error(`Gagal menambahkan ${prop}`)
     }
   }
   return (

@@ -46,8 +46,13 @@ export default function ConfirmDeleteModal({
           </Dialog.Title>
           <Dialog.Description className="font-normal text-lg mt-6">
             Anda yakin untuk menghapus{' '}
-            {prop.charAt(0).toUpperCase() + prop.slice(1)}{' '}
-            <span className="font-semibold">{data?.name}</span> ?
+            {prop == 'devices'
+              ? 'mac address'
+              : prop.charAt(0).toUpperCase() + prop.slice(1)}{' '}
+            <span className="font-semibold">
+              {prop == 'devices' ? data.mac : data?.name}
+            </span>{' '}
+            ?
           </Dialog.Description>
           <form
             onSubmit={submit}

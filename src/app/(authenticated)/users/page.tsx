@@ -2,13 +2,10 @@
 import React, { useEffect, useState } from 'react'
 import Table from '../../../components/Table'
 import { useGetList } from '~/services/dashboard'
-import Link from 'next/link'
 import AdminLayout from '../components/layoutAdmin'
 import Loading from '~/components/loading'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { BiSolidUserDetail } from 'react-icons/bi'
-import { Tooltip } from '@nextui-org/react'
 import { toast } from 'react-toastify'
 import EditUser from './editUser'
 
@@ -51,7 +48,7 @@ export default function Users(session: any) {
 
   const { data: userList, isLoading, isSuccess } = useGetList('users', filtered)
 
-  const columnDefWithCheckBox = () => [
+  const columnArray = [
     {
       accessorKey: 'no',
       header: 'No.',
@@ -114,6 +111,17 @@ export default function Users(session: any) {
       ),
     },
   ]
+
+  const columnDefWithCheckBox = () => {
+    if (role === 'SUPERADMIN') {
+      return columnArray
+    } else {
+      return columnArray.filter(
+        (column) =>
+          column.accessorKey !== 'kampus' && column.accessorKey !== 'unit',
+      )
+    }
+  }
 
   const showNotFound = isSuccess && !userList?.length
 

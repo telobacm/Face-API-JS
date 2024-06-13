@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+import { toast } from 'react-toastify'
 import EditModal from '~/app/(authenticated)/components/editModal'
 import FloatInput from '~/components/floatInput'
 import Loading from '~/components/loading'
@@ -14,14 +15,21 @@ export default function AddDevice({ prop }: any) {
     try {
       const { mac, kampus, unit } = e.target
 
+      // Normalize MAC address format
+      const normalizedMac = mac.value.toLowerCase().replace(/-/g, ':')
+
       const payload: any = {
-        mac: mac.value,
+        mac: normalizedMac,
         kampus: { connect: { id: parseInt(kampus.value) } },
         unit: { connect: { id: parseInt(unit.value) } },
       }
-      add(payload)
+      const res = await add(payload)
+      if (res.id) {
+        toast.success('Perangkat ditambahkan')
+      }
     } catch (error) {
       console.log(error)
+      toast.error('Gagal menambahkan Perangkat')
     }
   }
 
@@ -65,7 +73,6 @@ export default function AddDevice({ prop }: any) {
           <select
             required
             name="unit"
-            // onChange={(e) => unitChange(e.target.value)}
             className="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
           >
             <option value="" disabled selected hidden className="text-gray-400">

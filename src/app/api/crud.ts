@@ -165,7 +165,10 @@ export const REMOVE = async (req: NextRequest, { params }: any) => {
     const url = new URLSearchParams(req.url)
     await prisma[table].delete({
       where: {
-        id: table.includes('user') ? params.id.toString() : parseInt(params.id),
+        id:
+          table.includes('users') || table.includes('devices')
+            ? params.id.toString()
+            : parseInt(params.id),
       },
     })
     return new NextResponse(null, { status: 204 })

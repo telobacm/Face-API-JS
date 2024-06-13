@@ -209,14 +209,35 @@ export const parseSort = (querySort: any) => {
     for (const col of cols) {
       const isDesc = col.charAt(0) === '-'
       const name = isDesc ? col.slice(1) : col
-      order.push({ [name]: isDesc ? 'desc' : 'asc' })
+      // Check for nested relations
+      if (name.includes('.')) {
+        const parts = name.split('.')
+        order.push({ [parts[0]]: { [parts[1]]: isDesc ? 'desc' : 'asc' } })
+      } else {
+        order.push({ [name]: isDesc ? 'desc' : 'asc' })
+      }
     }
-    // console.log(order)
   } else {
     order.push({ id: 'asc' })
   }
   return order
 }
+
+// export const parseSort = (querySort: any) => {
+//   const order: any = []
+//   if (querySort) {
+//     const cols = querySort.trim().split(',')
+//     for (const col of cols) {
+//       const isDesc = col.charAt(0) === '-'
+//       const name = isDesc ? col.slice(1) : col
+//       order.push({ [name]: isDesc ? 'desc' : 'asc' })
+//     }
+//     // console.log(order)
+//   } else {
+//     order.push({ id: 'asc' })
+//   }
+//   return order
+// }
 
 export const parseInclude = (queryInclude: any) => {
   let relations = {}

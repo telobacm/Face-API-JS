@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+import { toast } from 'react-toastify'
 import EditModal from '~/app/(authenticated)/components/editModal'
 import FloatInput from '~/components/floatInput'
 import Loading from '~/components/loading'
@@ -21,9 +22,13 @@ export default function EditDevice({ data, prop }: any) {
         kampus: { connect: { id: parseInt(kampus.value) } },
         unit: { connect: { id: parseInt(unit.value) } },
       }
-      await edit({ id: data.id, payload })
+      const res = await edit({ id: data.id, payload })
+      if (res.id) {
+        toast.success('Perangkat berhasil diedit')
+      }
     } catch (error) {
       console.log(error)
+      toast.error('Gagal mengedit Perangkat')
     }
   }
 
@@ -34,7 +39,7 @@ export default function EditDevice({ data, prop }: any) {
   return (
     <EditModal
       data={data}
-      title={`Edit ${prop.charAt(0).toUpperCase() + prop.slice(1)}`}
+      title={`Edit Device`}
       showImage={false}
       handleSubmit={handleSubmit}
     >

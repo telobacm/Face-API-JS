@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import * as faceapi from 'face-api.js'
 import { useGetList, usePost } from '~/services/dashboard'
 import Loading from '~/components/loading'
@@ -7,6 +7,7 @@ import { calculateEAR } from '~/helpers/utils'
 import dynamic from 'next/dynamic'
 import { toast } from 'react-toastify'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 const Clock = dynamic(() => import('../../../components/Clock'))
 
 function Root() {
@@ -35,7 +36,11 @@ function Root() {
   // AMBIL DATA PERANGKAT PRESENSI DARI DATABASE
   const { data: thisDevice, isSuccess: isSuccessDevice } = useGetList('address')
   // AMBIL DATA USER BESERTA DESCRIPTOR WAJAH USER DARI DATABASE
-  const { data: users, isSuccess: isSuccessUsers } = useGetList('users', {
+  const {
+    data: users,
+    isLoading: isLoadingUsers,
+    isSuccess: isSuccessUsers,
+  } = useGetList('users', {
     filter: { role: { not: 'SUPERADMIN' } },
   })
   // FUNGSI UNTUK UPLOAD REPORT PRESENSI
@@ -277,7 +282,7 @@ function Root() {
           await takePhoto(now, userData, expression)
         }
 
-        // DETEKSI JIKA BLINK TERLALU LAMA
+        // MULAI DETEKSI JIKA BLINK TERLALU LAMA
         if (!blinkStartTime) {
           setBlinkStartTime(now)
           setBlinkFrames(1)
@@ -387,6 +392,10 @@ function Root() {
     }, 10000)
   }
 
+  // CEK JIKA SESI LOGIN AKTIF
+  const { data: sessionData } = useSession()
+  const role = sessionData?.user?.role
+
   // AWAL HALAMAN DIMUAT KETIKA MASIH CEK 'APAKAH PERANGKAT TERDAFTAR UNTUK PRESENSI', HANYA AKAN MENAMPILKAN LOADING
   if (!isSuccessDevice) {
     return <Loading />
@@ -427,9 +436,6 @@ function Root() {
                 <video crossOrigin="anonymous" ref={webcamRef} autoPlay></video>
                 <canvas
                   ref={canvasRef}
-                  TERJADI
-                  ERROR
-                  ATAU
                   width="640"
                   height="480"
                   className="absolute inset-y-auto z-10 border-5 border-purple-600"
@@ -486,9 +492,25 @@ function Root() {
             )}
           </div>
           {/* TAMPILKAN LAYER LOADING KETIKA DESCRIPTOR BELUM SELESAI DIMUAT */}
-          {faceMatcher === null ? (
+          {isLoadingUsers ||
+          (isSuccessUsers && users.length && faceMatcher == null) ? (
             <Loading />
+          ) : // KETIKA TIDAK ADA DATA USER UNTUK DESCRIPTOR TAMPILKAN INFO TIDAK ADA DATA USER
+          isSuccessUsers && !users.length ? (
+            <div className="grid gap-4 h-full content-center text-center text-xl font-normal">
+              <p>Tidak ada data user yang terdaftar untuk persensi.</p>
+              {/* JIKA SESI LOGIN AKTIF & ROLE = SUPERADMIN / ADMIN, TAMPILKAN LINK KE REGISTER USER */}
+              {(role === 'SUPERADMIN' || role === 'ADMIN') && (
+                <Link
+                  href="/register"
+                  className="duration-150 ease-in-out hover:text-sky-800 hover:font-bold underline underline-offset-1"
+                >
+                  Daftarkan User
+                </Link>
+              )}
+            </div>
           ) : (
+            // TAMPILKAN TOMBOL KAMERA JIKA DESCRIPTOR SUDAH SIAP
             <button
               type="button"
               className={`${camOn ? 'bg-gray-500' : 'bg-blue-500'} ${
