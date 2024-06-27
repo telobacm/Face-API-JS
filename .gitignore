@@ -2,7 +2,7 @@
 
 # dependencies
 /node_modules
-/public/uploads
+/public/uploads/
 /.pnp
 .pnp.js
 
