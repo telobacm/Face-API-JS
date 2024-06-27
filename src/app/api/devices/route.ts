@@ -1,36 +1,27 @@
-import * as qs from 'qs'
-import { NextRequest, NextResponse } from 'next/server'
-import {
-  HandleError,
-  formatIncludeOrSelect,
-  parseFilter,
-  parseSort,
-} from '~/helpers/server'
-import { prisma } from '~/../prisma/client'
-import { CREATE, LIST } from '~/app/api/crud'
+import { NextResponse } from 'next/server'
+import * as os from 'os'
+import { HandleError } from '~/helpers/server'
 
-export const POST = CREATE
-
-export const GET = async (req: NextRequest) => {
+export const GET = async () => {
   try {
-    const table = req.nextUrl.pathname.split('/')[2]
-    const url = new URL(req.url).search.substring(1)
-    const {
-      sort,
-      part,
-      limit,
-      count,
-      include = {},
-      ...query
-    }: any = qs.parse(url)
+    const macSet = new Set<string>()
+    const networkInterfaces = os.networkInterfaces()
+    for (const [key, value] of Object.entries(networkInterfaces)) {
+      value?.forEach((val: any) => {
+        if (val.mac !== '00:00:00:00:00:00') {
+          macSet.add(val.mac)
+        }
+      })
+    }
 
-    const where = await parseFilter(query?.filter)
-    const orderBy = parseSort(sort)
+    const macList = Array.from(macSet)
 
-    // Include related entities
-    const params: any = {
-      where,
-      orderBy,
+    const deviceInfo = await prisma.devices.findFirst({
+      where: {
+        mac: {
+          in: macList,
+        },
+      },
       include: {
         kampus: {
           select: {
@@ -42,85 +33,16 @@ export const GET = async (req: NextRequest) => {
             name: true,
           },
         },
-        ...include,
       },
-    }
+    })
 
-    if (part && limit) {
-      params.skip = (parseInt(part) - 1) * parseInt(limit)
-      params.take = parseInt(limit)
-    }
-
-    let result: any = {}
-
-    if (count) {
-      const total = await prisma[table].count()
-      result = { total }
-    } else {
-      result = await prisma[table].findMany(params)
+    const result = {
+      macList,
+      deviceInfo,
     }
 
     return NextResponse.json(result)
-  } catch (error: any) {
+  } catch (error) {
     return HandleError(error)
   }
 }
-
-// export const GET = async (req: NextRequest) => {
-//   try {
-//     const table = req.nextUrl.pathname.split('/')[2]
-//     const url = new URL(req.url).search.substring(1)
-//     const {
-//       sort,
-//       part,
-//       limit,
-//       count,
-//       include = {},
-//       ...query
-//     }: any = qs.parse(url)
-
-//     const where = await parseFilter(query?.filter)
-//     const orderBy = parseSort(sort)
-
-//     // Always include kampus.name and unit.name
-//     const defaultInclude = {
-//       kampus: {
-//         select: {
-//           name: true,
-//         },
-//       },
-//       unit: {
-//         select: {
-//           name: true,
-//         },
-//       },
-//     }
-
-//     const params: any = {
-//       where,
-//       orderBy,
-//       include: {
-//         ...defaultInclude,
-//         ...include,
-//       },
-//     }
-
-//     if (part && limit) {
-//       params.skip = (parseInt(part) - 1) * parseInt(limit)
-//       params.take = parseInt(limit)
-//     }
-
-//     let result: any = {}
-
-//     if (count) {
-//       const total = await prisma[table].count()
-//       result = { total }
-//     } else {
-//       result = await prisma[table].findMany(params)
-//     }
-
-//     return NextResponse.json(result)
-//   } catch (error: any) {
-//     return HandleError(error)
-//   }
-// }

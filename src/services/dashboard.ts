@@ -15,7 +15,7 @@ export const useGetList = (table: string, params: any = {}) => {
       })
     : ''
   return useQuery({
-    queryKey: queryKeys.length ? [table, params] : [table],
+    queryKey: params ? [table, params] : [table],
     queryFn: async () => {
       try {
         const { data } = await api().get(`/${table + queryString}`)
@@ -30,7 +30,6 @@ export const useGetList = (table: string, params: any = {}) => {
 
 export const usePatch = (table: string, params: any = null) => {
   const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: async ({ id, payload }: any) => {
       const res = await api().patch(`/${table}/${id ? id : ''}`, payload)
@@ -39,6 +38,7 @@ export const usePatch = (table: string, params: any = null) => {
 
     onSuccess: () => {
       queryClient.invalidateQueries(params ? [table, params] : [table])
+      if (table == 'devices') queryClient.invalidateQueries(['address'])
     },
   })
 }

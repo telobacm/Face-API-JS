@@ -3,10 +3,9 @@ import { writeFile } from 'fs/promises'
 import { NextRequest, NextResponse } from 'next/server'
 import { handleProcessFile } from '~/helpers/server'
 import { HandleError } from '~/helpers/server'
-import { existsSync } from 'fs'
-import { prisma } from '../../../../prisma/client static'
-// import { prisma } from '../../../../prisma/client'
+import { prisma } from '~/../prisma/client'
 
+export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const data: any = await request.formData()
@@ -30,18 +29,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle the file processing
-    const { fileName, buffer, pathTo } = await handleProcessFile(file, '')
+    const { fileName, buffer } = await handleProcessFile(file, '')
 
-    if (!fileName || !buffer || !pathTo) {
+    if (!fileName || !buffer) {
       throw new Error('File processing failed')
     }
 
-    const filePath = path.join(pathTo, fileName)
+    const filePath = path.join(process.cwd(), 'public', 'uploads', fileName)
     await writeFile(filePath, buffer)
 
     const res = await prisma.reports.update({
       where: { id: parseInt(reportId) },
-      data: { image: fileName },
+      data: { image: `/uploads/${fileName}` },
     })
 
     return NextResponse.json(res)

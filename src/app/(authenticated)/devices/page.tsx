@@ -99,14 +99,6 @@ export default function Devices() {
                         {i < thisDevice.macList.length - 1 && ','}
                       </p>
                     ))}
-                    {/* {Array(10)
-                      .fill(thisDevice?.macList)
-                      .map((x, i) => (
-                        <p key={i}>
-                          <span className="font-semibold">{x}</span>
-                          {i < thisDevice.macList.length - 1 && ','}
-                        </p>
-                      ))} */}
                   </div>
                 </>
               )}

@@ -89,8 +89,8 @@ const subunitSeed: Prisma.SubunitUncheckedCreateInput[] = [
 
 const superAdmin = {
   name: 'Super Admin',
-  email: 'superadmin@mailinator.com',
-  password: 'asdzxc',
+  email: 'superadmin@mail.net',
+  password: 'qwerty',
   nip: 'A1',
   role: USER_ROLES.SUPERADMIN,
   position: POSITIONS.STAFF,
@@ -130,8 +130,8 @@ async function main() {
       await prisma.users.create({
         data: {
           name: 'Super Admin',
-          email: 'superadmin@mailinator.com',
-          password: 'asdzxc',
+          email: 'superadmin@mail.net',
+          password: 'qwerty',
           nip: 'A1',
           role: USER_ROLES.SUPERADMIN,
           position: POSITIONS.STAFF,

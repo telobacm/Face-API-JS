@@ -34,7 +34,11 @@ function Root() {
   const webcamRef = useRef()
   const canvasRef = useRef()
   // AMBIL DATA PERANGKAT PRESENSI DARI DATABASE
-  const { data: thisDevice, isSuccess: isSuccessDevice } = useGetList('address')
+  const {
+    data: thisDevice,
+    isLoading: isLoadingDevice,
+    isSuccess: isSuccessDevice,
+  } = useGetList('address')
   // AMBIL DATA USER BESERTA DESCRIPTOR WAJAH USER DARI DATABASE
   const {
     data: users,
@@ -397,7 +401,7 @@ function Root() {
   const role = sessionData?.user?.role
 
   // AWAL HALAMAN DIMUAT KETIKA MASIH CEK 'APAKAH PERANGKAT TERDAFTAR UNTUK PRESENSI', HANYA AKAN MENAMPILKAN LOADING
-  if (!isSuccessDevice) {
+  if (isLoadingDevice) {
     return <Loading />
   }
   return (

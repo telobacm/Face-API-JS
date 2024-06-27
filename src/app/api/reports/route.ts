@@ -1,6 +1,5 @@
 import * as qs from 'qs'
 import { NextRequest, NextResponse } from 'next/server'
-// import { prisma } from '~/../prisma/client static'
 import { Prisma } from '@prisma/client'
 import { prisma } from '~/../prisma/client'
 import dayjs from 'dayjs'
@@ -14,6 +13,7 @@ import {
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]/route'
 
+export const dynamic = 'force-dynamic'
 export const GET = async (req: NextRequest) => {
   try {
     const session: any = await getServerSession(authOptions)

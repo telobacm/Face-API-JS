@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import * as os from 'os'
 import { HandleError } from '~/helpers/server'
+import { prisma } from '~/../prisma/client'
 
+export const dynamic = 'force-dynamic'
 export const GET = async () => {
   try {
     const macSet = new Set<string>()
