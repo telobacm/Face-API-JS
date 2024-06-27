@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     const res = await prisma.reports.update({
       where: { id: parseInt(reportId) },
-      data: { image: `/uploads/${fileName}` },
+      data: { image: `${fileName}` },
     })
 
     return NextResponse.json(res)

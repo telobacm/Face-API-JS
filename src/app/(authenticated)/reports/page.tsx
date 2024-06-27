@@ -227,8 +227,7 @@ export default function Reports() {
           <img
             className="w-48 h-36"
             loading="lazy"
-            src={`${process.env.NEXT_PUBLIC_API_URL}/${row?.original?.image}`}
-            // src={`/uploads/${row?.original?.image}`}
+            src={`uploads/${row?.original?.image}`}
             alt="report photo"
           />
         </div>
