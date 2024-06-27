@@ -153,10 +153,6 @@ const RegisterCamera = ({ faceDescriptors, setFaceDescriptors }: any) => {
     }
   }
 
-  // const submitData = () => {
-  //   console.log('submitting data:', faceDescriptors)
-  // }
-
   return (
     <div className="flex flex-col gap-4 justify-between items-center p-8 h-5/6 relative">
       <div className="flex grow justify-center">

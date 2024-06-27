@@ -80,7 +80,6 @@ export default function Reports() {
       const [tahun, pekan]: any = week.split('-W')
       const tanggal = new Date(`${tahun}-01-01`)
       tanggal.setDate(tanggal.getDate() + (pekan - 1) * 7)
-      console.log('tanggal', tanggal)
 
       const startOfWeek = new Date(
         tanggal.getFullYear(),

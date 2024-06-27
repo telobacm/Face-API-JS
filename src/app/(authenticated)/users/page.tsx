@@ -15,8 +15,6 @@ export default function Users(session: any) {
   const role = data?.user?.role
 
   useEffect(() => {
-    // console.log('status', status)
-
     if (status !== 'loading') {
       if (status === 'unauthenticated') {
         router.push('/login')

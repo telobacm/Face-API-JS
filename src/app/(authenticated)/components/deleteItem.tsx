@@ -6,7 +6,6 @@ import { toast } from 'react-toastify'
 
 export default function DeleteItem({ data, prop }: any) {
   const { mutateAsync: deleteItem }: any = useDelete(prop)
-  // console.log('item', data)
 
   const handleSubmit = async (e: any) => {
     try {

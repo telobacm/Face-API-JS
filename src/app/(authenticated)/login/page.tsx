@@ -18,7 +18,7 @@ const Login = ({ session }: any) => {
       router.push('settings')
     }
   }, [status, router, role])
-  console.log('session', session)
+  // console.log('session', session)
 
   const handleSubmit = async (e: any) => {
     try {

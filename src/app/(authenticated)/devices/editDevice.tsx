@@ -10,7 +10,6 @@ export default function EditDevice({ data, prop }: any) {
   const { data: kampus, isLoading: isLoadingKampus } = useGetList('kampus')
   const { data: units, isLoading: isLoadingUnits } = useGetList('unit')
   const { mutateAsync: edit } = usePatch(prop)
-  // console.log('dataDevice', data.unitId)
 
   const handleSubmit = async (e: any) => {
     try {

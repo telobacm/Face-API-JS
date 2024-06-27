@@ -6,8 +6,6 @@ export const countEnterPunctuality = (
   data: Prisma.ReportsUncheckedCreateInput,
   body: any,
 ) => {
-  console.log('Presensi Masuk')
-
   data.enterExit = 'Masuk'
   if (user?.position === 'DOSEN') {
     data.isPunctual = 'Tepat Waktu'
@@ -52,39 +50,33 @@ export const countEnterPunctuality = (
     shift3Exit.setMinutes(0)
     shift3Exit.setSeconds(0)
     if (dayjs(body.timestamp) <= dayjs(shift1Entry)) {
-      console.log('if satpam 1')
       data.isPunctual = 'Tepat Waktu'
       data.shiftSatpam = 'Shift Pagi'
     } else if (
       dayjs(body.timestamp) > dayjs(shift1Entry) &&
       dayjs(body.timestamp) < dayjs(shift1Exit)
     ) {
-      console.log('if satpam 2')
       data.isPunctual = 'Terlambat'
       data.shiftSatpam = 'Shift Pagi'
     } else if (
       dayjs(body.timestamp) > dayjs(shift1Exit) &&
       dayjs(body.timestamp) <= dayjs(shift2Entry)
     ) {
-      console.log('if satpam 3')
       data.isPunctual = 'Tepat Waktu'
       data.shiftSatpam = 'Shift Sore'
     } else if (
       dayjs(body.timestamp) > dayjs(shift2Entry) &&
       dayjs(body.timestamp) < dayjs(shift2Exit)
     ) {
-      console.log('if satpam 4')
       data.isPunctual = 'Terlambat'
       data.shiftSatpam = 'Shift Sore'
     } else if (
       dayjs(body.timestamp) > dayjs(shift2Exit) &&
       dayjs(body.timestamp) <= dayjs(shift3Entry)
     ) {
-      console.log('if satpam 5')
       data.isPunctual = 'Tepat Waktu'
       data.shiftSatpam = 'Shift Malam'
     } else if (body.timestamp > shift3Entry) {
-      console.log('if satpam 6')
       data.isPunctual = 'Terlambat'
       data.shiftSatpam = 'Shift Malam'
     }
@@ -101,8 +93,6 @@ export const countExitAllowance = (
     dayjs(lastReport.timestamp),
     'hours',
   )
-  //BUG: log ini jalan, tapi nggak sampe log berikutnya, data enterExit belum masuk sudah dijalankan
-  console.log('Presensi Pulang')
 
   if (timeDifference < 6) {
     throw new Error(
@@ -112,7 +102,6 @@ export const countExitAllowance = (
     //Dianggap tidak presensi keluar sebelumnya, alihkan jadi masuk.
     countEnterPunctuality(user, data, body)
   } else if (timeDifference > 6 && timeDifference < 18) {
-    console.log('ini menjalankan POST report Pulang')
     data.enterExit = 'Pulang'
   }
 }

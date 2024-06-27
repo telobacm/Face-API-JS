@@ -82,39 +82,32 @@ export const POST = async (req: NextRequest, { params }: any) => {
       orderBy: { timestamp: 'desc' },
       where: { userId: body?.userId || '' },
     })
-    console.log('lastReport', lastReport)
 
     if (!lastReport?.enterExit) {
-      console.log('Tidak ditemukan report User ini sebelumnya')
       data.enterExit = 'Masuk'
       await countEnterPunctuality(user, data, body)
     }
 
     if (lastReport?.enterExit === 'Pulang') {
-      console.log('Report terakhir adalah Pulang')
       if (
         dayjs(lastReport.timestamp).format('YYYY-MM-DD') ===
         dayjs(body.timestamp).format('YYYY-MM-DD')
       ) {
-        console.log('Hari ini sudah presensi masuk dan pulang')
         return NextResponse.json(
           { message: 'Presensi hari ini sudah lengkap.' },
           { status: 500 },
         )
       } else {
-        console.log('Sekarang bikin presensi Masuk')
         data.enterExit = 'Masuk'
         await countEnterPunctuality(user, data, body)
       }
     }
 
     if (lastReport?.enterExit === 'Masuk') {
-      console.log('Report terakhir adalah Masuk')
       await countExitAllowance(user, data, body, lastReport)
     }
 
     const created = await prisma.reports.create({ data: data })
-    console.log(data)
 
     return NextResponse.json(created)
   } catch (error: any) {

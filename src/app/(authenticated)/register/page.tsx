@@ -99,7 +99,6 @@ const Register = () => {
         role: 'USER',
         descriptors: faceDescriptors,
       }
-      console.log(sessionData)
 
       if (role === 'SUPERADMIN') {
         payloadUser.kampus = { connect: { id: parseInt(kampus.value) } }
@@ -146,11 +145,6 @@ const Register = () => {
       toast.error(errorRegisterUser?.response?.data?.message)
     }
   }, [errorRegisterUser])
-
-  // console.log('kampus', kampus)
-  // console.log('units', units)
-  // console.log('subUnitDosen', subUnitDosen)
-  // console.log('subUnitStaff', subUnitStaff)
 
   const isLoading =
     isLoadingKampus &&

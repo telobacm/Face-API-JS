@@ -28,7 +28,6 @@ export default function Devices() {
     isSuccess,
   } = useGetList('devices', filtered)
   const { data: thisDevice } = useGetList('address')
-  // console.log('thisDevice', thisDevice)
 
   const columnDefWithCheckBox = () => [
     {

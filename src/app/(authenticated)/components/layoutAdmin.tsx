@@ -22,7 +22,6 @@ export default function AdminLayout({
 
   const session: any = useSession()
   const role = session?.data?.user?.role
-  // console.log('role', role)
 
   if (
     (blacklist.includes(pathname) && role === 'USER') ||

@@ -27,7 +27,6 @@ export default function EditUser({ data, role }: any) {
       console.log(error)
     }
   }
-  // console.log('dataUser', data)
 
   return (
     <EditModal

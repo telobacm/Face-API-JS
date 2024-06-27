@@ -44,7 +44,6 @@ export const formatIncludeOrSelect = (
   //     active: true,
   //   },
   // };
-  // console.log('__jalan');
 
   const userSelect = true
 
@@ -232,7 +231,6 @@ export const parseSort = (querySort: any) => {
 //       const name = isDesc ? col.slice(1) : col
 //       order.push({ [name]: isDesc ? 'desc' : 'asc' })
 //     }
-//     // console.log(order)
 //   } else {
 //     order.push({ id: 'asc' })
 //   }

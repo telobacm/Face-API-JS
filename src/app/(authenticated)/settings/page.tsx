@@ -28,7 +28,6 @@ export default function Setting() {
   }: any = useSession()
   const { data: currentUser, isLoading: isLoadingUser } =
     useGetList('users/' + sessionData?.user?.id) || {}
-  console.log('currentUser', currentUser)
 
   const { mutateAsync: updateUser } = usePatch('users')
   const {
