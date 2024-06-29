@@ -95,7 +95,7 @@ export default function Users(session: any) {
       header: 'Whitelist',
       cell: ({ row }: any) => (
         <div className="flex justify-center">
-          <span>{row?.original?.whitelist ? '✅' : '❌'}</span>
+          <span>{row?.original?.whitelist ? 'Whitelist' : 'Bukan'}</span>
         </div>
       ),
     },

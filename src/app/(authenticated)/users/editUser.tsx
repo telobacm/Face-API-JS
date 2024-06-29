@@ -132,6 +132,7 @@ export default function EditUser({ data, role }: any) {
               />
               <span className="checkmark bg-gray-100" />
             </label>
+            {/* <p className='mt-4'>{data.whitelist ? 'Whitelist' : 'Bukan Whitelist'}</p> */}
           </div>
         </div>
       ) : (

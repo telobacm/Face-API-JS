@@ -204,15 +204,15 @@ export default function Reports() {
     {
       accessorKey: 'isPunctual',
       header: 'Tepat Waktu',
-      cell: ({ cell }: any) => (
-        <span className="pl-3">
-          {cell.getValue() === 'Tepat Waktu'
-            ? '✅'
-            : cell.getValue() === 'Terlambat'
-              ? '❌'
-              : '-'}
-        </span>
-      ),
+      // cell: ({ cell }: any) => (
+      //   <span className="pl-3">
+      //     {cell.getValue() === 'Tepat Waktu'
+      //       ? 'Ya'
+      //       : cell.getValue() === 'Terlambat'
+      //         ? 'Tidak'
+      //         : '-'}
+      //   </span>
+      // ),
     },
     {
       accessorKey: 'ekspresi',

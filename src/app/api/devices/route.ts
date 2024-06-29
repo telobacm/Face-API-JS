@@ -1,27 +1,36 @@
-import { NextResponse } from 'next/server'
-import * as os from 'os'
-import { HandleError } from '~/helpers/server'
+import * as qs from 'qs'
+import { NextRequest, NextResponse } from 'next/server'
+import {
+  HandleError,
+  formatIncludeOrSelect,
+  parseFilter,
+  parseSort,
+} from '~/helpers/server'
+import { prisma } from '~/../prisma/client'
+import { CREATE, LIST } from '~/app/api/crud'
 
-export const GET = async () => {
+export const POST = CREATE
+
+export const GET = async (req: NextRequest) => {
   try {
-    const macSet = new Set<string>()
-    const networkInterfaces = os.networkInterfaces()
-    for (const [key, value] of Object.entries(networkInterfaces)) {
-      value?.forEach((val: any) => {
-        if (val.mac !== '00:00:00:00:00:00') {
-          macSet.add(val.mac)
-        }
-      })
-    }
+    const table = req.nextUrl.pathname.split('/')[2]
+    const url = new URL(req.url).search.substring(1)
+    const {
+      sort,
+      part,
+      limit,
+      count,
+      include = {},
+      ...query
+    }: any = qs.parse(url)
 
-    const macList = Array.from(macSet)
+    const where = await parseFilter(query?.filter)
+    const orderBy = parseSort(sort)
 
-    const deviceInfo = await prisma.devices.findFirst({
-      where: {
-        mac: {
-          in: macList,
-        },
-      },
+    // Include related entities
+    const params: any = {
+      where,
+      orderBy,
       include: {
         kampus: {
           select: {
@@ -33,16 +42,26 @@ export const GET = async () => {
             name: true,
           },
         },
+        ...include,
       },
-    })
+    }
 
-    const result = {
-      macList,
-      deviceInfo,
+    if (part && limit) {
+      params.skip = (parseInt(part) - 1) * parseInt(limit)
+      params.take = parseInt(limit)
+    }
+
+    let result: any = {}
+
+    if (count) {
+      const total = await prisma[table].count()
+      result = { total }
+    } else {
+      result = await prisma[table].findMany(params)
     }
 
     return NextResponse.json(result)
-  } catch (error) {
+  } catch (error: any) {
     return HandleError(error)
   }
 }

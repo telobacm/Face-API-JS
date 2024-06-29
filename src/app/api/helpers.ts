@@ -50,33 +50,39 @@ export const countEnterPunctuality = (
     shift3Exit.setMinutes(0)
     shift3Exit.setSeconds(0)
     if (dayjs(body.timestamp) <= dayjs(shift1Entry)) {
+      console.log('if satpam 1')
       data.isPunctual = 'Tepat Waktu'
       data.shiftSatpam = 'Shift Pagi'
     } else if (
       dayjs(body.timestamp) > dayjs(shift1Entry) &&
       dayjs(body.timestamp) < dayjs(shift1Exit)
     ) {
+      console.log('if satpam 2')
       data.isPunctual = 'Terlambat'
       data.shiftSatpam = 'Shift Pagi'
     } else if (
       dayjs(body.timestamp) > dayjs(shift1Exit) &&
       dayjs(body.timestamp) <= dayjs(shift2Entry)
     ) {
+      console.log('if satpam 3')
       data.isPunctual = 'Tepat Waktu'
       data.shiftSatpam = 'Shift Sore'
     } else if (
       dayjs(body.timestamp) > dayjs(shift2Entry) &&
       dayjs(body.timestamp) < dayjs(shift2Exit)
     ) {
+      console.log('if satpam 4')
       data.isPunctual = 'Terlambat'
       data.shiftSatpam = 'Shift Sore'
     } else if (
       dayjs(body.timestamp) > dayjs(shift2Exit) &&
       dayjs(body.timestamp) <= dayjs(shift3Entry)
     ) {
+      console.log('if satpam 5')
       data.isPunctual = 'Tepat Waktu'
       data.shiftSatpam = 'Shift Malam'
-    } else if (body.timestamp > shift3Entry) {
+    } else if (dayjs(body.timestamp) > dayjs(shift3Entry)) {
+      console.log('if satpam 6')
       data.isPunctual = 'Terlambat'
       data.shiftSatpam = 'Shift Malam'
     }
@@ -89,19 +95,48 @@ export const countExitAllowance = (
   body: any,
   lastReport: any,
 ) => {
-  const timeDifference = dayjs(body.timestamp).diff(
-    dayjs(lastReport.timestamp),
-    'hours',
-  )
+  console.log('lastReport', lastReport)
+  console.log('body', body)
+  console.log('user', user)
 
-  if (timeDifference < 6) {
-    throw new Error(
-      'Belum bisa presensi keluar, belum memenuhi minimum jam kerja.',
-    )
-  } else if (timeDifference > 18) {
-    //Dianggap tidak presensi keluar sebelumnya, alihkan jadi masuk.
-    countEnterPunctuality(user, data, body)
-  } else if (timeDifference > 6 && timeDifference < 18) {
+  const currentTimestamp = dayjs(body.timestamp)
+  const lastTimestamp = dayjs(lastReport.timestamp)
+  const timeDifference = currentTimestamp.diff(lastTimestamp, 'hours')
+
+  const isNextDay = !currentTimestamp.isSame(lastTimestamp, 'day')
+
+  // Alur logic presensi pulang jika user adalah SATPAM
+  if (user?.position === 'SATPAM') {
+    if (timeDifference < 6) {
+      throw new Error(
+        'Belum bisa presensi keluar, belum memenuhi minimum jam kerja.',
+      )
+    } else if (timeDifference > 18) {
+      //Dianggap tidak presensi keluar sebelumnya, alihkan jadi masuk.
+      countEnterPunctuality(user, data, body)
+    } else if (timeDifference > 6 && timeDifference < 18) {
+      data.enterExit = 'Pulang'
+    }
+  }
+  // Alur logic presensi pulang jika user adalah STAFF
+  if (user?.position === 'STAFF') {
+    // jika sudah 18 jam dari presensi masuk atau sudah beda hari, maka jadikan presensi masuk baru
+    if (timeDifference > 18 || isNextDay) {
+      countEnterPunctuality(user, data, body)
+    }
+    // jika belum 6 jam dari presensi masuk, belum bisa pulang
+    else if (timeDifference < 6) {
+      throw new Error(
+        'Belum bisa presensi keluar, belum memenuhi minimum jam kerja.',
+      )
+    }
+    // jika sudah lebih dari 6 jam, kurang dari 18 jam, dan harinya masih sama, maka presensi pulang
+    else if (timeDifference > 6 && timeDifference < 18 && !isNextDay) {
+      data.enterExit = 'Pulang'
+    }
+  }
+  // Alur logic jika user adalah DOSEN
+  if (user?.position === 'DOSEN') {
     data.enterExit = 'Pulang'
   }
 }
