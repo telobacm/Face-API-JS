@@ -95,9 +95,9 @@ export const countExitAllowance = (
   body: any,
   lastReport: any,
 ) => {
-  console.log('lastReport', lastReport)
-  console.log('body', body)
-  console.log('user', user)
+  // console.log('lastReport', lastReport)
+  // console.log('body', body)
+  // console.log('user', user)
 
   const currentTimestamp = dayjs(body.timestamp)
   const lastTimestamp = dayjs(lastReport.timestamp)

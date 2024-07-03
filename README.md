@@ -12,7 +12,7 @@ cp .env.example .env
 npm install
 ```
 
-3. Create new database`genza`
+3. Create new database`faceapijs`
 4. Populate database
 
 ```bash
@@ -33,11 +33,7 @@ npm run build
 npm start
 ```
 
-## Dashboard
-
-To access dashboard go to /dashboard page ex: `http://localhost:3000/dashboard` with credentials:
-
 ```
-User: admin@mailinator.com
-Pass: admin1234
+User: superadmin@mail.net
+Pass: qwerty
 ```
