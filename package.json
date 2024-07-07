@@ -45,6 +45,7 @@
     "react-twitter-widgets": "^1.11.0",
     "sharp": "^0.32.1",
     "slick-carousel": "^1.8.1",
+    "socket.io-client": "^4.7.5",
     "swiper": "^8.3.2",
     "tailwindcss": "^3.4.1",
     "uuid": "^9.0.0"

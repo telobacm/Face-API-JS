@@ -13,6 +13,11 @@ export default function DeleteItem({ data, prop }: any) {
       toast.success(
         `${prop == 'devices' ? 'Perangkat' : prop.charAt(0).toUpperCase() + prop.slice(1)} berhasil dihapus`,
       )
+      // SEMENTARA MASIH GAGAL invalidateQueries /devices
+      {
+        prop == 'devices' &&
+          toast.info('Silakan refresh jika perubahan terkait perangkat anda')
+      }
     } catch (error: any) {
       toast.error(
         `Gagal menghapus ${prop == 'devices' ? 'Perangkat' : prop.charAt(0).toUpperCase() + prop.slice(1)}`,

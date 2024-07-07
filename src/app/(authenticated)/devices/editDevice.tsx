@@ -24,6 +24,8 @@ export default function EditDevice({ data, prop }: any) {
       const res = await edit({ id: data.id, payload })
       if (res.id) {
         toast.success('Perangkat berhasil diedit')
+        // SEMENTARA MASIH GAGAL invalidateQueries
+        toast.info('Silakan refresh jika perubahan terkait perangkat anda')
       }
     } catch (error) {
       console.log(error)

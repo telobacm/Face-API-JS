@@ -2,7 +2,6 @@
 
 # dependencies
 /node_modules
-/public/uploads/
 /.pnp
 .pnp.js
 
@@ -34,3 +33,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# image upload path
+/public/uploads/*
+!/public/uploads/.gitkeep

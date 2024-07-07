@@ -26,6 +26,8 @@ export default function AddDevice({ prop }: any) {
       const res = await add(payload)
       if (res.id) {
         toast.success('Perangkat ditambahkan')
+        // SEMENTARA MASIH GAGAL invalidateQueries
+        toast.info('Silakan refresh jika perubahan terkait perangkat anda')
       }
     } catch (error) {
       console.log(error)

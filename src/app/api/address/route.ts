@@ -4,6 +4,7 @@ import { HandleError } from '~/helpers/server'
 import { prisma } from '~/../prisma/client'
 
 export const dynamic = 'force-dynamic'
+// INI TIDAK LAGI DIGUNAKAN KARENA TERNYATA os.networkInterfaces() TIDAK BERJALAN DI CLIENT. IA HANYA BERJALAN DI SERVER DAN HANYA AKAN MEMBERIKAN HASIL YANG SESUAI JIKA DIJALANKAN PADA LOCALHOST, TIDAK PADA REMOTE NETWORK. UNTUK SEKARANG GUNAKAN /address/[mac]
 export const GET = async () => {
   try {
     const macSet = new Set<string>()

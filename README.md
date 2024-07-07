@@ -33,6 +33,7 @@ npm run build
 npm start
 ```
 
+Superadmin login:
 ```
 User: superadmin@mail.net
 Pass: qwerty

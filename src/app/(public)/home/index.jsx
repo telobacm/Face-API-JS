@@ -8,6 +8,8 @@ import dynamic from 'next/dynamic'
 import { toast } from 'react-toastify'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
+import axios from 'axios'
+import HomeLayout from '~/app/(authenticated)/components/layoutHome'
 const Clock = dynamic(() => import('../../../components/Clock'))
 
 function Root() {
@@ -33,12 +35,50 @@ function Root() {
   const capturedPhotoRef = useRef()
   const webcamRef = useRef()
   const canvasRef = useRef()
-  // AMBIL DATA PERANGKAT PRESENSI DARI DATABASE
-  const {
-    data: thisDevice,
-    isLoading: isLoadingDevice,
-    isSuccess: isSuccessDevice,
-  } = useGetList('address')
+
+  /////  simpan Mac Address di localStorage dan GET /address  /////
+  const [thisDevice, setThisDevice] = useState()
+  const [isLoadingAddress, setIsLoadingAddress] = useState(true)
+  const [isStoredMac, setIsStoredMac] = useState(false)
+  const [macAddress, setMacAddress] = useState()
+  // const [isSuccessAddress, setIsSuccessAddress] = useState(false)
+  // Ambil dan simpan MAC address di localStorage
+  const urlParams = new URLSearchParams(window.location.search)
+  const receivedMacAddress = urlParams.get('mac_address')
+  if (receivedMacAddress) {
+    localStorage.setItem('macAddress', receivedMacAddress.toLowerCase())
+  }
+
+  // Cek localStorage saat load Home page
+  useEffect(() => {
+    const storedMacAddress = localStorage.getItem('macAddress')
+    if (!storedMacAddress) {
+      // console.log('Tidak ada Mac Address tersimpan.')
+      toast.error('Tidak ada Mac Address tersimpan.')
+      setIsLoadingAddress(false)
+    } else {
+      setMacAddress(storedMacAddress)
+      setIsStoredMac(true)
+
+      // AMBIL DATA PERANGKAT PRESENSI DARI DATABASE
+      axios
+        .get(`/api/address/${storedMacAddress}`)
+        .then((response) => {
+          setThisDevice(response.data)
+          // console.log('res axios', response.data)
+          // setIsSuccessAddress(true);
+        })
+        .catch((error) => {
+          console.error('Error fetching data', error)
+          // toast.error('Error fetching data', error)
+        })
+        .finally(() => {
+          setIsLoadingAddress(false)
+        })
+    }
+  }, [])
+  ///// simpan Mac Address di localStorage dan GET /address /////
+
   // AMBIL DATA USER BESERTA DESCRIPTOR WAJAH USER DARI DATABASE
   const {
     data: users,
@@ -348,7 +388,7 @@ function Root() {
 
   // FUNGSI UPLOAD/POST REPORT PRESENSI
   const uploadReport = async (now, userData, expression, myFile) => {
-    const device = thisDevice?.deviceInfo
+    const device = thisDevice
     try {
       // HENTIKAN PROSES DI SINI JIKA KAMPUS DAN UNIT USER TIDAK COCOK DENGAN KAMPUS DAN UNIT MESIN PRESENSI
       if (
@@ -401,25 +441,33 @@ function Root() {
   const role = sessionData?.user?.role
 
   // AWAL HALAMAN DIMUAT KETIKA MASIH CEK 'APAKAH PERANGKAT TERDAFTAR UNTUK PRESENSI', HANYA AKAN MENAMPILKAN LOADING
-  if (isLoadingDevice) {
+  if (isLoadingAddress) {
     return <Loading />
   }
   return (
-    <div>
-      {/* JIKA PERANGKAT TIDAK TERDAFTAR UNTUK PRESENSI MAKA AKAN MENAMPILKAN TULISAN INFO DAN LINK KE LOGIN */}
-      {!thisDevice?.deviceInfo?.id ? (
+    <HomeLayout>
+      {/* JIKA PERANGKAT TIDAK TERDAFTAR UNTUK PRESENSI MAKA AKAN MENAMPILKAN INFO */}
+      {!thisDevice?.id ? (
         <div className="grid gap-4 justify-items-center content-center h-screen relative text-xl font-normal">
-          <p>Perangkat ini tidak terdaftar sebagai perangkat presensi.</p>
-          <p>
-            Silakan{' '}
-            <Link
-              href="/login"
-              className="duration-150 ease-in-out hover:text-sky-800 hover:font-bold underline underline-offset-1"
-            >
-              LogIn
-            </Link>{' '}
-            untuk ke halaman dashboard
-          </p>
+          {!isStoredMac ? (
+            // KETIKA TIDAK ADA MAC ADDRESS DI LOCAL STORAGE
+            <p>Mac Address tidak terdeteksi.</p>
+          ) : (
+            // KETIKA ADA MAC ADDRESS DI LOCAL STORAGE, TAPI TIDAK COCOK DENGAN DATABASE DEVICES
+            <div>
+              <p>Perangkat ini tidak terdaftar sebagai perangkat presensi.</p>
+              <p>
+                Silakan{' '}
+                <Link
+                  href="/login"
+                  className="duration-150 ease-in-out hover:text-sky-800 hover:font-bold underline underline-offset-1"
+                >
+                  LogIn
+                </Link>{' '}
+                untuk ke halaman dashboard
+              </p>
+            </div>
+          )}
           <div className="absolute bottom-8">
             <Clock />
           </div>
@@ -531,27 +579,31 @@ function Root() {
           >
             {/* JAM */}
             <Clock />
-            {!!thisDevice?.deviceInfo?.id && (
+            {/* INFO KAMPUS DAN UNIT PERANGKAT PRESENSI */}
+            {!!thisDevice?.id && (
               <div className="grid justify-items-center text-lg">
-                {/* INFO KAMPUS DAN UNIT PERANGKAT PRESENSI */}
                 <div>
                   Kampus:{' '}
                   <span className="font-semibold">
-                    {thisDevice?.deviceInfo?.kampus?.name}
+                    {thisDevice?.kampus?.name}
                   </span>
                 </div>
                 <div>
                   Unit:{' '}
                   <span className="font-semibold">
-                    {thisDevice?.deviceInfo?.unit?.name}
+                    {thisDevice?.unit?.name}
                   </span>
                 </div>
               </div>
             )}
+            {/* <p>
+              MAC Address:{' '}
+              {macAddress ? macAddress : 'Waiting for MAC address...'}
+            </p> */}
           </div>
         </div>
       )}
-    </div>
+    </HomeLayout>
   )
 }
 export default Root

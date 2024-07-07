@@ -1,13 +1,8 @@
 import * as qs from 'qs'
 import { NextRequest, NextResponse } from 'next/server'
-import {
-  HandleError,
-  formatIncludeOrSelect,
-  parseFilter,
-  parseSort,
-} from '~/helpers/server'
+import { HandleError, parseFilter, parseSort } from '~/helpers/server'
 import { prisma } from '~/../prisma/client'
-import { CREATE, LIST } from '~/app/api/crud'
+import { CREATE } from '~/app/api/crud'
 
 export const POST = CREATE
 

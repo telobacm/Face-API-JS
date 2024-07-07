@@ -30,15 +30,21 @@ export const useGetList = (table: string, params: any = {}) => {
 
 export const usePatch = (table: string, params: any = null) => {
   const queryClient = useQueryClient()
+  let mac = <string | null>null
   return useMutation({
     mutationFn: async ({ id, payload }: any) => {
+      mac = payload.mac
       const res = await api().patch(`/${table}/${id ? id : ''}`, payload)
       return res.data
     },
 
     onSuccess: () => {
       queryClient.invalidateQueries(params ? [table, params] : [table])
-      if (table == 'devices') queryClient.invalidateQueries(['address'])
+      // JIKA TERJADI PATCH PADA /devices, MAKA CEK JUGA PERUBAHAN DI /address
+      if (table == 'devices') {
+        queryClient.invalidateQueries(['address'])
+        // queryClient.invalidateQueries([`address/[${mac}]`])
+      }
     },
   })
 }

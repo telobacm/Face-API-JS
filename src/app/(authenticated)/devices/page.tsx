@@ -9,6 +9,8 @@ import { useSession } from 'next-auth/react'
 import DeleteItem from '../components/deleteItem'
 import AddDevice from './addDevice'
 import EditDevice from './editDevice'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 export default function Devices() {
   const [searchValue, setSearchValue] = useState('')
@@ -27,7 +29,49 @@ export default function Devices() {
     isLoading,
     isSuccess,
   } = useGetList('devices', filtered)
-  const { data: thisDevice } = useGetList('address')
+
+  /////  simpan Mac Address di localStorage dan GET /address  /////
+  const [thisDevice, setThisDevice] = useState<any>()
+  const [isLoadingAddress, setIsLoadingAddress] = useState<boolean>(true)
+  const [isStoredMac, setIsStoredMac] = useState<boolean>(false)
+  const [macAddress, setMacAddress] = useState<string | null>()
+  // const [isSuccessAddress, setIsSuccessAddress] = useState(false)
+  // Ambil dan simpan MAC address di localStorage
+  const urlParams = new URLSearchParams(window.location.search)
+  const receivedMacAddress = urlParams.get('mac_address')
+  if (receivedMacAddress) {
+    localStorage.setItem('macAddress', receivedMacAddress.toLowerCase())
+  }
+
+  // Cek localStorage saat load Home page
+  useEffect(() => {
+    const storedMacAddress: any = localStorage.getItem('macAddress')
+    if (!storedMacAddress) {
+      // console.log('Tidak ada Mac Address tersimpan.')
+      toast.error('Tidak ada Mac Address tersimpan.')
+      setIsLoadingAddress(false)
+    } else {
+      setMacAddress(storedMacAddress)
+      setIsStoredMac(true)
+
+      // AMBIL DATA PERANGKAT PRESENSI DARI DATABASE
+      axios
+        .get(`/api/address/${storedMacAddress}`)
+        .then((response) => {
+          setThisDevice(response.data)
+          // console.log('res axios', response.data)
+          // setIsSuccessAddress(true);
+        })
+        .catch((error) => {
+          console.error('Error fetching data', error)
+          // toast.error('Error fetching data', error)
+        })
+        .finally(() => {
+          setIsLoadingAddress(false)
+        })
+    }
+  }, [])
+  ///// simpan Mac Address di localStorage dan GET /address /////
 
   const columnDefWithCheckBox = () => [
     {
@@ -72,54 +116,57 @@ export default function Devices() {
       router.push('/settings')
   }, [status, router, role])
 
-  if (isLoading) {
+  if (isLoading || isLoadingAddress) {
     return <Loading />
   }
   return (
     status == 'authenticated' && (
       <AdminLayout sidebar={true} header={true}>
         <div className="flex justify-between items-start gap-6">
-          {!!thisDevice && (
-            <div className="grid text-normal gap-1.5">
-              {!thisDevice?.deviceInfo?.id && (
-                <>
-                  <div>
-                    <p>
+          <div className="grid text-normal gap-1.5">
+            {!isStoredMac ? (
+              // KETIKA TIDAK ADA MAC ADDRESS DI LOCAL STORAGE
+              <p>Mac Address tidak terdeteksi.</p>
+            ) : (
+              // KETIKA ADA MAC ADDRESS DI LOCAL STORAGE, TAPI TIDAK COCOK DENGAN DATABASE DEVICES
+              <>
+                {!thisDevice?.id && (
+                  <>
+                    <div>
                       Perangkat ini tidak terdaftar untuk mesin presensi, ingin
                       anda daftarkan ?
-                    </p>
-                    <p>Pilih salah satu mac Address anda untuk didaftarkan</p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    Mac adress:{' '}
-                    {thisDevice?.macList?.map((x: string, i: number) => (
-                      <p key={i}>
-                        <span className="font-semibold">{x}</span>
-                        {i < thisDevice.macList.length - 1 && ','}
-                      </p>
-                    ))}
-                  </div>
-                </>
-              )}
-              {!!thisDevice?.deviceInfo?.id && (
-                <>
-                  <div>Perangkat ini terdaftar untuk mesin presensi:</div>
-                  <div className="">
-                    Kampus:{' '}
-                    <span className="font-semibold">
-                      {thisDevice?.deviceInfo?.kampus?.name}
-                    </span>
-                  </div>
-                  <div className="">
-                    Unit:{' '}
-                    <span className="font-semibold">
-                      {thisDevice?.deviceInfo?.unit?.name}
-                    </span>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      Mac adress:{' '}
+                      <span className="font-semibold">{macAddress}</span>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+
+            {!!isStoredMac && !!thisDevice?.id && (
+              <>
+                <div>Perangkat ini terdaftar untuk mesin presensi:</div>
+                <div className="">
+                  Kampus:{' '}
+                  <span className="font-semibold">
+                    {thisDevice?.kampus?.name}
+                  </span>
+                </div>
+                <div className="">
+                  Unit:{' '}
+                  <span className="font-semibold">
+                    {thisDevice?.unit?.name}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  Mac adress:{' '}
+                  <span className="font-semibold">{macAddress}</span>
+                </div>
+              </>
+            )}
+          </div>
           <AddDevice prop="devices" />
         </div>
         <Table
