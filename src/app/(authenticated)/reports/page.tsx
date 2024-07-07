@@ -155,10 +155,13 @@ export default function Reports() {
     },
     {
       accessorKey: 'user.name',
-      header: 'Nama',
+      header: 'Nama & NIP',
       cell: ({ row }: any) => (
         <div className="flex justify-between">
-          <span>{row?.original?.user?.name}</span>
+          <div className="grid gap-1 divide-y divide-gray-300">
+            <p>{row?.original?.user?.name}</p>
+            <p>{row?.original?.user?.nip}</p>
+          </div>
           <Link href={`reports/${row?.original?.user?.id}`}>
             <div className="w-fit p-2.5 -m-2 rounded-lg hover:bg-blue-400 text-black hover:text-blue-100">
               <BiSolidUserDetail />
@@ -168,51 +171,48 @@ export default function Reports() {
       ),
     },
     {
-      accessorKey: 'user.nip',
-      header: 'NIP',
+      accessorKey: 'kampus & unit',
+      header: 'Kampus & Unit',
+      cell: ({ row }: any) => (
+        <div className="grid gap-1 divide-y divide-gray-300">
+          <p>{row?.original?.user?.kampus?.name}</p>
+          <p>{row?.original?.user?.unit?.name}</p>
+        </div>
+      ),
     },
     {
-      accessorKey: 'kampus',
-      header: 'Kampus',
-      cell: ({ row }: any) => <span>{row?.original?.user?.kampus?.name}</span>,
-    },
-    {
-      accessorKey: 'unit',
-      header: 'Unit',
-      cell: ({ row }: any) => <span>{row?.original?.user?.unit?.name}</span>,
-    },
-    {
-      accessorKey: 'timestamp-date',
-      header: 'Tanggal',
+      accessorKey: 'timestamp',
+      header: 'Tanggal & Jam',
       cell: ({ row }: any) => {
         const date = dayjs(row?.original?.timestamp)
-        return date.format('dddd, DD MMMM YYYY')
+        return (
+          <div className="grid gap-1 divide-y divide-gray-300">
+            <p>{date.format('dddd, DD MMMM YYYY')}</p>
+            <p>{date.format('HH:mm:ss')}</p>
+          </div>
+        )
       },
-    },
-    {
-      accessorKey: 'timestamp-hour',
-      header: 'Jam',
-      cell: ({ row }: any) => {
-        const hour = dayjs(row?.original?.timestamp)
-        return hour.format('HH:mm:ss')
-      },
-    },
-    {
-      accessorKey: 'enterExit',
-      header: 'Masuk/Pulang',
     },
     {
       accessorKey: 'isPunctual',
-      header: 'Tepat Waktu',
-      // cell: ({ cell }: any) => (
-      //   <span className="pl-3">
-      //     {cell.getValue() === 'Tepat Waktu'
-      //       ? 'Ya'
-      //       : cell.getValue() === 'Terlambat'
-      //         ? 'Tidak'
-      //         : '-'}
-      //   </span>
-      // ),
+      header: 'Masuk/Pulang',
+      cell: ({ row }: any) => (
+        <div className="grid gap-1 divide-y divide-gray-300">
+          <p>{row?.original?.enterExit}</p>
+          <p>
+            {row?.original?.isPunctual !== null
+              ? row?.original?.isPunctual
+              : '-'}
+          </p>
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'shiftSatpam',
+      header: 'shift Satpam',
+      cell: ({ cell }: any) => (
+        <span>{cell.getValue() !== null ? cell.getValue() : '-'}</span>
+      ),
     },
     {
       accessorKey: 'ekspresi',

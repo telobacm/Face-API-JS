@@ -28,7 +28,7 @@ export const countEnterPunctuality = (
     shift1Entry.setMinutes(0)
     shift1Entry.setSeconds(0)
     const shift1Exit = new Date()
-    shift1Exit.setHours(10)
+    shift1Exit.setHours(12)
     shift1Exit.setMinutes(0)
     shift1Exit.setSeconds(0)
 
@@ -37,7 +37,7 @@ export const countEnterPunctuality = (
     shift2Entry.setMinutes(0)
     shift2Entry.setSeconds(0)
     const shift2Exit = new Date()
-    shift2Exit.setHours(18)
+    shift2Exit.setHours(20)
     shift2Exit.setMinutes(0)
     shift2Exit.setSeconds(0)
 
@@ -46,7 +46,7 @@ export const countEnterPunctuality = (
     shift3Entry.setMinutes(0)
     shift3Entry.setSeconds(0)
     const shift3Exit = new Date()
-    shift3Exit.setHours(2)
+    shift3Exit.setHours(4)
     shift3Exit.setMinutes(0)
     shift3Exit.setSeconds(0)
     if (dayjs(body.timestamp) <= dayjs(shift1Entry)) {
@@ -101,6 +101,7 @@ export const countExitAllowance = (
 
   const currentTimestamp = dayjs(body.timestamp)
   const lastTimestamp = dayjs(lastReport.timestamp)
+  const shiftSatpam = lastReport.shiftSatpam
   const timeDifference = currentTimestamp.diff(lastTimestamp, 'hours')
 
   const isNextDay = !currentTimestamp.isSame(lastTimestamp, 'day')
@@ -133,6 +134,7 @@ export const countExitAllowance = (
     // jika sudah lebih dari 6 jam, kurang dari 18 jam, dan harinya masih sama, maka presensi pulang
     else if (timeDifference > 6 && timeDifference < 18 && !isNextDay) {
       data.enterExit = 'Pulang'
+      data.shiftSatpam = shiftSatpam
     }
   }
   // Alur logic jika user adalah DOSEN
