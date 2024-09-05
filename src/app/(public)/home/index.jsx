@@ -263,7 +263,13 @@ function Root() {
           const nip = bestMatch.label.split(' / ')[1]
           const confidence = 1 - bestMatch.distance
 
-          const text = `${nama} (${Math.round(confidence * 100)}%)`
+          // JIKA KEMIRIPAN LEBIH DARI 60% MAKA TAMPILKAN "NAMA (..%)"
+          // KURANG DARI ITU TAMPILKAN "tidak dikenali"
+          const text =
+            confidence >= 0.6
+              ? `${nama} (${Math.round(confidence * 100)})%`
+              : 'tidak dikenali'
+
           const anchor = {
             x: resizedDetections.detection.box.x,
             y: resizedDetections.detection.box.y,
@@ -278,8 +284,11 @@ function Root() {
             drawOptions,
           )
           drawBox.draw(canvas)
-          // SETELAH WAJAH TERDETEKSI, LANJUT DETEKSI KEDIPAN USER
-          detectBlink(detections, nip)
+          // SETELAH WAJAH TERDETEKSI DENGAN KEMIRIPAN LEBIH DARI 60%
+          if (confidence >= 0.6) {
+            // LANJUT DETEKSI KEDIPAN USER
+            detectBlink(detections, nip)
+          }
         }
       }
     }, 100)
@@ -404,6 +413,8 @@ function Root() {
         timestamp: now,
         ekspresi: expression,
         userId: userData?.id,
+        kampusId: device?.kampusId,
+        unitId: device?.unitId,
       }
       // POST PRESENSI
       const res = await postReport(payload)

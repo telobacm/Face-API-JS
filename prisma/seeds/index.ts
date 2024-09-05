@@ -140,6 +140,7 @@ async function main() {
           gender: 'Pria',
           whitelist: false,
           descriptors: [{}],
+          isDeleted: false,
         },
       })
     }

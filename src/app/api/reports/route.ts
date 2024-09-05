@@ -78,6 +78,15 @@ export const POST = async (req: NextRequest, { params }: any) => {
     })
 
     const data: Prisma.ReportsUncheckedCreateInput = body ? { ...body } : {}
+
+    // ChatGPT suggestion Prepare the data for the new report
+    // const data: Prisma.ReportsUncheckedCreateInput = {
+    //   ...body,
+    // user: { connect: { id: body.userId } }, // Connect the user
+    // kampus: { connect: { id: body.kampusId } },
+    // unit: { connect: { id: body.unitId } },
+    // }
+
     const lastReport = await prisma.reports.findFirst({
       orderBy: { timestamp: 'desc' },
       where: { userId: body?.userId || '' },
