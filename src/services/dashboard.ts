@@ -33,7 +33,7 @@ export const usePatch = (table: string, params: any = null) => {
   let mac = <string | null>null
   return useMutation({
     mutationFn: async ({ id, payload }: any) => {
-      mac = payload.mac
+      // mac = payload?.mac
       const res = await api().patch(`/${table}/${id ? id : ''}`, payload)
       return res.data
     },

@@ -8,13 +8,12 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { toast } from 'react-toastify'
 import { BiSolidPencil } from 'react-icons/bi'
-import useUserStore from '~/store/store'
+import Link from 'next/link'
 
 export default function Users(session: any) {
   const router = useRouter()
   const { status, data }: any = useSession()
   const role = data?.user?.role
-  const { user, setUser } = useUserStore()
 
   useEffect(() => {
     if (status !== 'loading') {
@@ -43,17 +42,11 @@ export default function Users(session: any) {
     filter: {
       search: searchValue,
       search_keys: search_keys,
+      isDeleted: false,
     },
   }
 
   const { data: userList, isLoading, isSuccess } = useGetList('users', filtered)
-
-  const editUser = (id: string) => {
-    // setUser(userList.find((x: any) => x.id === id))
-    const userToEdit = userList.find((x: any) => x.id === id)
-    localStorage.setItem('user', JSON.stringify(userToEdit))
-    router.push(`users/${id}`)
-  }
 
   const columnArray = [
     {
@@ -113,14 +106,11 @@ export default function Users(session: any) {
       header: 'Action',
       cell: ({ row }: any) => (
         <div className="flex justify-center">
-          {/* <Link href={`users/${row?.original?.id}`}> */}
-          <button
-            onClick={() => editUser(row?.original?.id)}
-            className="w-fit p-2.5 -m-2 rounded-lg hover:bg-blue-400 text-black hover:text-blue-100"
-          >
-            <BiSolidPencil />
-          </button>
-          {/* </Link> */}
+          <Link href={`users/${row?.original?.id}`}>
+            <button className="w-fit p-2.5 -m-2 rounded-lg hover:bg-blue-400 text-black hover:text-blue-100">
+              <BiSolidPencil />
+            </button>
+          </Link>
         </div>
       ),
     },

@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import { toast } from 'react-toastify'
-import EditModal from '~/app/(authenticated)/components/editModal'
 import AdminLayout from '~/app/(authenticated)/components/layoutAdmin'
 import Loading from '~/components/loading'
 import { genders, positions } from '~/helpers/constant'
@@ -12,28 +11,7 @@ import { useGetList, usePatch } from '~/services/dashboard'
 import EditCamera from './EditCamera'
 import Link from 'next/link'
 import { BiChevronLeft, BiSolidPencil } from 'react-icons/bi'
-import useUserStore from '~/store/store'
-
-interface User {
-  id: number
-  name: string
-  password: string
-  nip: string
-  email: string
-  role: string
-  position: string
-  gender: string
-  whitelist: boolean
-  kampusId: number
-  unitId: number
-  subunitId: number
-  descriptors: object
-  kampus: object
-  unit: object
-  subunit: object
-  isDeleted: boolean
-  // Add other user properties here
-}
+import DeleteItem from '../../components/deleteItem'
 
 export default function EditUser(props: any) {
   const router = useRouter()
@@ -41,17 +19,6 @@ export default function EditUser(props: any) {
   const sessionRole = sessionData?.user?.role
   const userId = props?.params?.id
   const { data, isLoading: isLoadingUser } = useGetList(`users/${userId}`)
-  // const { user, setUser } = useUserStore()
-  // const [data, setData] = useState<any>()
-
-  // useEffect(() => {
-  //   // Load user from localStorage
-  //   const storedUser = localStorage.getItem('user')
-  //   if (storedUser) {
-  //     setData(JSON.parse(storedUser))
-  //   }
-  // }, [])
-  // console.log('localStorage', data)
 
   const {
     data: campuses,
@@ -171,7 +138,7 @@ export default function EditUser(props: any) {
   }, [status, router, sessionRole])
 
   const isLoading =
-    !isSuccessUser &&
+    isLoadingUser &&
     isLoadingKampus &&
     isLoadingUnits &&
     isLoadingSubUnitDosen &&
@@ -526,9 +493,7 @@ export default function EditUser(props: any) {
             </div>
           </form>
           <div className={`flex justify-start gap-3`}>
-            <button className="mt-3 bg-red-700 text-white px-5 py-2 rounded-xl">
-              Delete User
-            </button>
+            <DeleteItem prop="users" data={data} />
           </div>
         </div>
       </AdminLayout>

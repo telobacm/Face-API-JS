@@ -34,7 +34,9 @@ export const authOptions: NextAuthOptions = {
           const user: any = await prisma.users.findUnique({
             where: { email },
           })
-          if (email === user.email && password === user.password) {
+          if (!!user.isDeleted) {
+            throw new Error('Akun ini sudah tidak aktif.')
+          } else if (email === user.email && password === user.password) {
             delete user.password
             return user
           } else {

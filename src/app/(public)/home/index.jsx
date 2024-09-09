@@ -85,7 +85,7 @@ function Root() {
     isLoading: isLoadingUsers,
     isSuccess: isSuccessUsers,
   } = useGetList('users', {
-    filter: { role: { not: 'SUPERADMIN' } },
+    filter: { role: { not: 'SUPERADMIN' }, isDeleted: false },
   })
   // FUNGSI UNTUK UPLOAD REPORT PRESENSI
   const { mutateAsync: postReport } = usePost('reports')

@@ -28,9 +28,20 @@ export default function ConfirmDeleteModal({
     <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <Dialog.Trigger asChild>
         <div className="px-1">
-          <button className="text-lg mx-auto inline-flex justify-center  w-fit p-2.5 -m-2 rounded-lg hover:bg-red-500 text-black hover:text-gray-300">
-            <BiTrash />
-          </button>
+          {prop === 'users' ? (
+            <button
+              disabled={data?.role === 'SUPERADMIN'}
+              className="mt-3 bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-5 py-2 rounded-xl"
+            >
+              Delete User
+            </button>
+          ) : (
+            <button
+              className={`text-lg mx-auto inline-flex justify-center  w-fit p-2.5 -m-2 rounded-lg hover:bg-red-500 text-black hover:text-gray-300`}
+            >
+              <BiTrash />
+            </button>
+          )}
         </div>
       </Dialog.Trigger>
       <Dialog.Portal>
@@ -46,11 +57,13 @@ export default function ConfirmDeleteModal({
           </Dialog.Title>
           <Dialog.Description className="font-normal text-lg mt-6">
             Anda yakin untuk menghapus{' '}
-            {prop == 'devices'
+            {prop === 'devices'
               ? 'mac address'
-              : prop.charAt(0).toUpperCase() + prop.slice(1)}{' '}
+              : prop === 'users'
+                ? 'User'
+                : prop.charAt(0).toUpperCase() + prop.slice(1)}{' '}
             <span className="font-semibold">
-              {prop == 'devices' ? data.mac : data?.name}
+              {prop === 'devices' ? data?.mac : data?.name}
             </span>{' '}
             ?
           </Dialog.Description>
@@ -64,7 +77,7 @@ export default function ConfirmDeleteModal({
                 type="submit"
                 className="bg-red-700 text-white px-5 py-2 rounded-xl"
               >
-                Save
+                Delete
               </button>
               <button
                 onClick={closeModal}

@@ -45,7 +45,6 @@ model Users {
   kampus      Kampus     @relation(fields: [kampusId], references: [id])
   unit        Unit       @relation(fields: [unitId], references: [id])
   subunit     Subunit?   @relation(fields: [subunitId], references: [id])
-
   isDeleted   Boolean    @default(false)
 
   @@map("users")
@@ -56,7 +55,6 @@ model Kampus {
   name    String
   devices Devices[]
   users   Users[]
-
   reports Reports[]
 
   @@map("kampus")
@@ -67,7 +65,6 @@ model Unit {
   name    String
   devices Devices[]
   users   Users[]
-
   reports Reports[]
 
   @@map("unit")
@@ -92,7 +89,6 @@ model Reports {
   userId      String
   image       String?
   user        Users      @relation(fields: [userId], references: [id])
-
   kampusId    Int
   unitId      Int
   kampus      Kampus     @relation(fields: [kampusId], references: [id])

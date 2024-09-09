@@ -11,6 +11,7 @@ import { BiSolidUserDetail } from 'react-icons/bi'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import 'dayjs/locale/id'
+import DeleteItem from '../components/deleteItem'
 dayjs.locale('id')
 
 export default function Reports() {
@@ -159,14 +160,26 @@ export default function Reports() {
       cell: ({ row }: any) => (
         <div className="flex justify-between">
           <div className="grid gap-1 divide-y divide-gray-300">
+            {!!row?.original?.user?.isDeleted ? (
+              <div className="flex items-center text-xs text-red-500 gap-0.5">
+                <span className="w-1.5 h-1.5 mb-1 bg-red-500 rounded-full"></span>
+                <span>deleted user</span>
+              </div>
+            ) : (
+              ''
+            )}
             <p>{row?.original?.user?.name}</p>
             <p>{row?.original?.user?.nip}</p>
           </div>
-          <Link href={`reports/${row?.original?.user?.id}`}>
-            <div className="w-fit p-2.5 -m-2 rounded-lg hover:bg-blue-400 text-black hover:text-blue-100">
-              <BiSolidUserDetail />
-            </div>
-          </Link>
+          {!row?.original?.user?.isDeleted ? (
+            <Link href={`reports/${row?.original?.user?.id}`}>
+              <div className="w-fit p-2.5 -m-2 rounded-lg hover:bg-blue-400 text-black hover:text-blue-100">
+                <BiSolidUserDetail />
+              </div>
+            </Link>
+          ) : (
+            ''
+          )}
         </div>
       ),
     },
@@ -229,6 +242,15 @@ export default function Reports() {
             src={`uploads/${row?.original?.image}`}
             alt="report photo"
           />
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'delete',
+      header: 'Del',
+      cell: ({ row }: any) => (
+        <div className="flex justify-center items-center">
+          <DeleteItem prop="reports" data={row?.original} />
         </div>
       ),
     },

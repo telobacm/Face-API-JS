@@ -1,13 +1,14 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SidebarAdmin from './sidebarAdmin'
 import HeaderAdmin from './headerAdmin'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import NotFound from '~/app/not-found'
 import { usePathname } from 'next/navigation'
+import { useGetList } from '~/services/dashboard'
 
 const blacklist = ['/users', '/devices']
 const blacklistAdminUnit = ['/devices']
@@ -15,13 +16,31 @@ const blacklistAdminUnit = ['/devices']
 export default function AdminLayout({
   children,
   sidebar = true,
-  header = true, // session,
+  header = true,
 }: any) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
 
   const session: any = useSession()
   const role = session?.data?.user?.role
+  const userId = session?.data?.user?.id
+
+  const { data: user } = useGetList(`users/${userId}`)
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      if (userId) {
+        try {
+          if (!!user?.isDeleted) {
+            signOut()
+          }
+        } catch (error) {
+          console.error('Failed to verify user status:', error)
+        }
+      }
+    }
+
+    checkUserStatus()
+  }, [userId])
 
   if (
     (blacklist.includes(pathname) && role === 'USER') ||

@@ -6,7 +6,6 @@ import { REMOVE, UPDATE } from '~/app/api/crud'
 import { HandleError, parseFilter, parseSort } from '~/helpers/server'
 
 export const PATCH = UPDATE
-export const DELETE = REMOVE
 
 export const GET = async (req: NextRequest, { params }: any) => {
   try {
@@ -51,6 +50,7 @@ export const GET = async (req: NextRequest, { params }: any) => {
     // Include related entities
     const queryParams: any = {
       where: {
+        // Add this condition to exclude users with isDeleted: true
         id: table.includes('users')
           ? params.id.toString()
           : parseInt(params.id),

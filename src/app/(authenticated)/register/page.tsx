@@ -402,10 +402,12 @@ const Register = () => {
             </div>
           </div>
         </form>
-        <RegisterCamera
-          faceDescriptors={faceDescriptors}
-          setFaceDescriptors={setFaceDescriptors}
-        />
+        <div className="flex-grow">
+          <RegisterCamera
+            faceDescriptors={faceDescriptors}
+            setFaceDescriptors={setFaceDescriptors}
+          />
+        </div>
       </div>
     </AdminLayout>
   )
