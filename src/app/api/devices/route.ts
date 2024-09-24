@@ -2,11 +2,10 @@ import * as qs from 'qs'
 import { NextRequest, NextResponse } from 'next/server'
 import { HandleError, parseFilter, parseSort } from '~/helpers/server'
 import { prisma } from '~/../prisma/client'
-import { CREATE } from '~/app/api/crud'
+import { CREATE, LIST } from '~/app/api/crud'
 
 export const POST = CREATE
-
-export const GET = async (req: NextRequest) => {
+export const GET = async (req: NextRequest, P: any) => {
   try {
     const table = req.nextUrl.pathname.split('/')[2]
     const url = new URL(req.url).search.substring(1)
@@ -14,18 +13,16 @@ export const GET = async (req: NextRequest) => {
       sort,
       part,
       limit,
-      count,
+
       include = {},
       ...query
     }: any = qs.parse(url)
 
-    const where = await parseFilter(query?.filter)
-    const orderBy = parseSort(sort)
+    const where = {}
 
     // Include related entities
     const params: any = {
       where,
-      orderBy,
       include: {
         kampus: {
           select: {
@@ -41,21 +38,7 @@ export const GET = async (req: NextRequest) => {
       },
     }
 
-    if (part && limit) {
-      params.skip = (parseInt(part) - 1) * parseInt(limit)
-      params.take = parseInt(limit)
-    }
-
-    let result: any = {}
-
-    if (count) {
-      const total = await prisma[table].count()
-      result = { total }
-    } else {
-      result = await prisma[table].findMany(params)
-    }
-
-    return NextResponse.json(result)
+    return LIST(req, { ...P, ...params })
   } catch (error: any) {
     return HandleError(error)
   }

@@ -121,7 +121,7 @@ function Root() {
       if (isSuccessUsers) {
         const labeledFaceDescriptors = []
 
-        for (const item of users) {
+        for (const item of users.data) {
           const descriptors = []
           for (const descriptor of item.descriptors) {
             const float32ArrayDescriptor = new Float32Array(
@@ -315,7 +315,7 @@ function Root() {
         // BLINK DETECTED
 
         // COCOKKAN NIP DARI FACE DESCRIPTOR DENGAN USER TERDAFTAR DI DATABASE
-        const userData = await users.find((u) => u.nip === nip)
+        const userData = await users.data.find((u) => u.nip === nip)
         await setUser(() => userData)
 
         // AMBIL EKSPRESI PALING DOMINAN
@@ -556,10 +556,10 @@ function Root() {
           </div>
           {/* TAMPILKAN LAYER LOADING KETIKA DESCRIPTOR BELUM SELESAI DIMUAT */}
           {isLoadingUsers ||
-          (isSuccessUsers && users.length && faceMatcher == null) ? (
+          (isSuccessUsers && users.data.length && faceMatcher == null) ? (
             <Loading />
           ) : // KETIKA TIDAK ADA DATA USER UNTUK DESCRIPTOR TAMPILKAN INFO TIDAK ADA DATA USER
-          isSuccessUsers && !users.length ? (
+          isSuccessUsers && !users.data.length ? (
             <div className="grid gap-4 h-full content-center text-center text-xl font-normal">
               <p>Tidak ada data user yang terdaftar untuk persensi.</p>
               {/* JIKA SESI LOGIN AKTIF & ROLE = SUPERADMIN / ADMIN, TAMPILKAN LINK KE REGISTER USER */}

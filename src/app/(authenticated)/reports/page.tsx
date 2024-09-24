@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+import { defaultPage } from '~/components/Pagination'
 import Table from '../../../components/Table'
 import { useGetList } from '~/services/dashboard'
 import AdminLayout from '../components/layoutAdmin'
@@ -28,8 +29,16 @@ export default function Reports() {
     }
   }, [status, router, role])
   // GET data kampus dan unit
-  const { data: kampus, isLoading: isLoadingKampus } = useGetList('kampus')
-  const { data: units, isLoading: isLoadingUnits } = useGetList('unit')
+  const {
+    data: kampus,
+    isLoading: isLoadingKampus,
+    isFetching: isFetchingKampus,
+  } = useGetList('kampus')
+  const {
+    data: units,
+    isLoading: isLoadingUnits,
+    isFetching: isFetchingUnits,
+  } = useGetList('unit')
   //filter unit
   const [filterKampus, setFilterKampus] = useState<any>()
   const [filterUnit, setFilterUnit] = useState<any>()
@@ -41,10 +50,10 @@ export default function Reports() {
   const [endDate, setEndDate] = useState<any>()
 
   const [searchValue, setSearchValue] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
+  const [page, setPage] = useState(defaultPage)
   const search_keys = 'user.name,user.nip'
   const [filtered, SetFiltered] = useState({
-    page: currentPage,
+    page: page.current,
     filter: {
       search: searchValue,
       search_keys: search_keys,
@@ -124,7 +133,7 @@ export default function Reports() {
     setStartDate(null)
     setEndDate(null)
     const initialFilter = {
-      page: currentPage,
+      page: page.current,
       filter: {
         search: searchValue,
         search_keys: search_keys,
@@ -146,6 +155,7 @@ export default function Reports() {
   const {
     data: tableData,
     isLoading: isLoadingReports,
+    isFetching: isFetchingReports,
     isSuccess,
   } = useGetList('reports', filtered)
   const columnArray = [
@@ -268,7 +278,10 @@ export default function Reports() {
   }
 
   const showNotFound = isSuccess && !tableData?.length
-  const isLoading = isLoadingReports && isLoadingKampus && isLoadingUnits
+  const isLoading = isLoadingReports || isLoadingKampus || isLoadingUnits
+  const loading =
+    isLoading || isFetchingReports || isFetchingKampus || isFetchingUnits
+
   if (isLoading) {
     return <Loading />
   }
@@ -443,20 +456,17 @@ export default function Reports() {
           </div>
           <div className="flex-none">
             {!!tableData ? (
-              <PieChart
-                data={tableData}
-                counted="ekspresi"
-                label="Chart Ekspresi"
-              />
+              <PieChart counted="ekspresi" label="Chart Ekspresi" />
             ) : (
               ''
             )}
           </div>
         </div>
         <Table
+          loading={loading}
+          columns={columnDefWithCheckBox()}
           searchValueProps={[searchValue, setSearchValue]}
-          currentPageProps={[currentPage, setCurrentPage]}
-          finalColumnDef={columnDefWithCheckBox()}
+          currentPageProps={[page, setPage]}
           title={'by user name or nip'}
           data={tableData}
           showNotFound={showNotFound}

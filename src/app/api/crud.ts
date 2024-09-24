@@ -1,6 +1,14 @@
 import * as qs from 'qs'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '~/../prisma/client'
+import {
+  handleError,
+  isObjectEmpty,
+  mergeObjects,
+  // parseFilter,
+  parseInclude,
+  sortingDataWithParams,
+} from './index'
 // import { unlink } from 'fs/promises'
 import path from 'path'
 import {
@@ -13,43 +21,96 @@ import {
 const imagePath = path.resolve('./public/images')
 const videoPath = path.resolve('./public/videos')
 
-export const LIST = async (req: NextRequest) => {
+type obj = { [key: string]: any }
+type args = {
+  params?: any
+  select?: obj
+  include?: obj
+  where?: obj
+  withoutLimitPagination?: boolean
+  returnValue?: boolean
+  QParams?: obj
+  body?: obj
+}
+
+function completeParams({
+  params,
+  select,
+  include,
+}: {
+  params: obj
+  select: obj
+  include: obj
+}) {
+  if (!isObjectEmpty(include)) {
+    params.include = include
+  }
+  if (!isObjectEmpty(select)) {
+    params.select = select
+  }
+}
+
+export const LIST = async (
+  req: NextRequest,
+  {
+    include,
+    where = {},
+    select = {},
+    withoutLimitPagination = false,
+    returnValue,
+    QParams,
+  }: args,
+): Promise<any> => {
   try {
     const table = req.nextUrl.pathname.split('/')[2]
     const url = new URL(req.url).search.substring(1)
     const {
-      sort,
-      part,
-      limit,
-      count,
-      include = {},
+      page,
+      take,
+      include: QInclude,
       ...query
-    }: any = qs.parse(url)
-
-    const where = await parseFilter(query?.filter)
-    const orderBy = parseSort(sort)
-
-    formatIncludeOrSelect(include)
-    const params: any = { where, orderBy, include }
-
-    if (part && limit) {
-      params.skip = (parseInt(part) - 1) * parseInt(limit)
-      params.skip = (parseInt(part) - 1) * parseInt(limit)
-      params.take = parseInt(limit)
+    }: any = QParams || qs.parse(url)
+    const params: any = {
+      // where: { ...parseFilter(filter), ...where },
+      where: where.AND
+        ? { AND: [where.AND, parseFilter(query.filter)] }
+        : mergeObjects(parseFilter(query.filter), where),
     }
 
-    let result = {}
-
-    if (count) {
-      const total = await prisma[table].count()
-      result = { total }
-    } else {
-      result = await prisma[table].findMany(params)
+    if (!withoutLimitPagination || (page && take)) {
+      params.skip = (parseInt(page || 1) - 1) * parseInt(take || 10)
+      params.take = parseInt(take || 10)
     }
 
+    completeParams({
+      params,
+      select,
+      include: include || parseInclude(QInclude),
+    })
+    sortingDataWithParams(query.sort, params)
+    console.log('[PARAMS]:')
+    console.dir(params, { depth: 10 })
+    const [data, count] = await Promise.all([
+      prisma[table].findMany(params),
+      prisma[table].count({ where: params.where }),
+    ])
+    const result = {
+      data,
+      meta: {
+        count,
+        take: take || (withoutLimitPagination ? count : 10),
+        page: page || 1,
+        pageCount: Math.ceil(
+          count / (page || (withoutLimitPagination ? count : 10)),
+        ),
+      },
+    }
+    if (returnValue) {
+      return result
+    }
     return NextResponse.json(result)
-  } catch (error: any) {
-    return HandleError(error)
+  } catch (error) {
+    return handleError(error)
   }
 }
 

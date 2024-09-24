@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+import { defaultPage } from '~/components/Pagination'
 import Table from '../../../components/Table'
 import { useGetList } from '~/services/dashboard'
 import AdminLayout from '../components/layoutAdmin'
@@ -14,10 +15,10 @@ import { toast } from 'react-toastify'
 
 export default function Devices() {
   const [searchValue, setSearchValue] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
+  const [page, setPage] = useState(defaultPage)
   const search_keys = 'kampus.name,unit.name'
   const filtered: any = {
-    page: currentPage,
+    page: page.current,
     filter: {
       search: searchValue,
       search_keys: search_keys,
@@ -27,6 +28,7 @@ export default function Devices() {
   const {
     data: devices,
     isLoading,
+    isFetching,
     isSuccess,
   } = useGetList('devices', filtered)
 
@@ -170,9 +172,10 @@ export default function Devices() {
           <AddDevice prop="devices" />
         </div>
         <Table
+          loading={isLoading || isFetching}
+          columns={columnDefWithCheckBox()}
           searchValueProps={[searchValue, setSearchValue]}
-          currentPageProps={[currentPage, setCurrentPage]}
-          finalColumnDef={columnDefWithCheckBox()}
+          currentPageProps={[page, setPage]}
           title={'device by kampus or unit'}
           data={devices}
           showNotFound={showNotFound}

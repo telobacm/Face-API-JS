@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+import { defaultPage } from '~/components/Pagination'
 import Table from '../../../components/Table'
 import { useGetList } from '~/services/dashboard'
 import AdminLayout from '../components/layoutAdmin'
@@ -9,6 +10,7 @@ import { useSession } from 'next-auth/react'
 import { toast } from 'react-toastify'
 import { BiSolidPencil } from 'react-icons/bi'
 import Link from 'next/link'
+import { isFloat64Array } from 'util/types'
 
 export default function Users(session: any) {
   const router = useRouter()
@@ -34,11 +36,11 @@ export default function Users(session: any) {
     }
   }, [])
 
-  const [searchValue, setSearchValue] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
+  const [searchValue, setSearchValue] = useState<string>('')
+  const [page, setPage] = useState(defaultPage)
   const search_keys = 'name,nip'
   const filtered: any = {
-    page: currentPage,
+    page: page.current,
     filter: {
       search: searchValue,
       search_keys: search_keys,
@@ -46,7 +48,12 @@ export default function Users(session: any) {
     },
   }
 
-  const { data: userList, isLoading, isSuccess } = useGetList('users', filtered)
+  const {
+    data: userList,
+    isLoading,
+    isFetching,
+    isSuccess,
+  } = useGetList('users', filtered)
 
   const columnArray = [
     {
@@ -136,9 +143,10 @@ export default function Users(session: any) {
     status == 'authenticated' && (
       <AdminLayout sidebar={true} header={true}>
         <Table
+          loading={isLoading || isFetching}
+          columns={columnDefWithCheckBox()}
           searchValueProps={[searchValue, setSearchValue]}
-          currentPageProps={[currentPage, setCurrentPage]}
-          finalColumnDef={columnDefWithCheckBox()}
+          currentPageProps={[page, setPage]}
           title={'user by name or nip'}
           data={userList}
           showNotFound={showNotFound}

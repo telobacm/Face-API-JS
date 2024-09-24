@@ -12,31 +12,22 @@ import {
 } from '~/helpers/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]/route'
+import { LIST } from '../crud'
 
 export const dynamic = 'force-dynamic'
-export const GET = async (req: NextRequest) => {
+
+export const GET = async (req: NextRequest, P: any) => {
   try {
     const session: any = await getServerSession(authOptions)
     const user = session?.user
 
     const table = req.nextUrl.pathname.split('/')[2]
     const url = new URL(req.url).search.substring(1)
-    const {
-      sort,
-      part,
-      limit,
-      count,
-      include = {},
-      // ...query
-      filter = {}, // Destructure filter directly
-    }: any = qs.parse(url)
+    const { sort, part, limit, include = {} }: any = qs.parse(url)
 
-    // const where = await parseFilter(filter)
-    const where = await parseFilter(filter)
-    const orderBy = parseSort(sort)
+    const where = {}
 
-    formatIncludeOrSelect(include)
-    const params: any = { where, orderBy, include }
+    const params: any = { where, include }
 
     if (part && limit) {
       params.skip = (parseInt(part) - 1) * parseInt(limit)
@@ -53,16 +44,8 @@ export const GET = async (req: NextRequest) => {
         },
       }
     }
-    let result = {}
 
-    if (count) {
-      const total = await prisma[table].count({ where: params.where })
-      result = { total }
-    } else {
-      result = await prisma[table].findMany(params)
-    }
-
-    return NextResponse.json(result)
+    return LIST(req, { ...P, ...params })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }

@@ -3,10 +3,12 @@ export default function Loading({
   fullscreen = true,
   className = '',
 }: any) {
-  const isFixed = fullscreen ? 'fixed h-screen' : 'absolute h-full'
+  const isFixed = fullscreen
+    ? 'fixed h-screen w-full top-0 left-0 right-0 bottom-0 bg-slate-100 z-50  overflow-hidden opacity-75'
+    : ''
   return (
     <div
-      className={`${isFixed} ${className} top-0 left-0 right-0 bottom-0 bg-slate-100 w-full z-50 overflow-hidden opacity-75 flex flex-col items-center justify-center`}
+      className={`${isFixed} ${className} flex flex-col items-center justify-center`}
     >
       <div role="status">
         <svg
@@ -25,11 +27,13 @@ export default function Loading({
             fill="currentFill"
           />
         </svg>
-        <span className="sr-only">Loading...</span>
+        {fullscreen && <span className="sr-only">Loading...</span>}
       </div>
-      <h2 className="text-primary text-center font-semibold tracking-wider">
-        {message || 'Loading ...'}
-      </h2>
+      {fullscreen && (
+        <h2 className="text-primary text-center font-semibold tracking-wider">
+          {message || 'Loading ...'}
+        </h2>
+      )}
     </div>
   )
 }

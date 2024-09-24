@@ -5,6 +5,7 @@ import Loading from '~/components/loading'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import AdminLayout from '../../components/layoutAdmin'
+import { defaultPage } from '~/components/Pagination'
 import Table from '~/components/Table'
 import Link from 'next/link'
 import { BiChevronLeft } from 'react-icons/bi'
@@ -21,7 +22,7 @@ export default function UserReport(props: any) {
   const userId = props?.params?.id
 
   const [searchValue, setSearchValue] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
+  const [page, setPage] = useState(defaultPage)
   // const search_keys = 'ekspresi'
 
   // GET user/id untuk info user
@@ -29,7 +30,7 @@ export default function UserReport(props: any) {
 
   // GET reports per user
   const filterReports: any = {
-    page: currentPage,
+    page: page.current,
     filter: {
       userId: userId,
       // search: searchValue,
@@ -186,19 +187,17 @@ export default function UserReport(props: any) {
             </div>
           )}
           <div className="">
-            {!!reports && (
-              <PieChart
-                data={reports}
-                counted="ekspresi"
-                label="Chart Ekspresi"
-              />
+            {!!reports ? (
+              <PieChart counted="ekspresi" label="Chart Ekspresi" />
+            ) : (
+              ''
             )}
           </div>
         </div>
         <Table
+          columns={columnDefWithCheckBox()}
           searchValueProps={[searchValue, setSearchValue]}
-          currentPageProps={[currentPage, setCurrentPage]}
-          finalColumnDef={columnDefWithCheckBox()}
+          currentPageProps={[page, setPage]}
           title={'Report'}
           data={reports}
           showNotFound={showNotFound}

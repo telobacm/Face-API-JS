@@ -2,6 +2,7 @@ import React from 'react'
 import { Pie } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
+import { useGetList } from '~/services/dashboard'
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels)
 
 const transformData = (reports: any[], counted: string) => {
@@ -45,15 +46,9 @@ const prepareChartData = (counts: { [key: string]: number }) => {
   }
 }
 
-const PieChart = ({
-  data,
-  label,
-  counted,
-}: {
-  data: any[]
-  label: string
-  counted: string
-}) => {
+const PieChart = ({ label, counted }: { label: string; counted: string }) => {
+  const { data: datas } = useGetList('reports/chart')
+  const data = datas?.data || []
   const counts = transformData(data, counted)
   const chartData = prepareChartData(counts)
 
