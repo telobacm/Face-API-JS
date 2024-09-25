@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect } from 'react'
 import AdminLayout from '~/app/(authenticated)/components/layoutAdmin'
-import CharLimit from '~/components/charLimit'
 import { useGetList } from '~/services/dashboard'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -17,6 +16,8 @@ export default function Page() {
   const router = useRouter()
   const { status, data: sessionData }: any = useSession()
   const role = sessionData?.user?.role
+  console.log('role',role);
+  
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login')
     if (status === 'authenticated' && role !== 'SUPERADMIN')
@@ -49,8 +50,8 @@ export default function Page() {
                 </tr>
               </thead>
               <tbody>
-                {!!kampus?.length &&
-                  kampus.map((kampus: any, i: any) => (
+                {!!kampus?.data?.length &&
+                  kampus?.data?.map((kampus: any, i: any) => (
                     <tr
                       key={i}
                       className={`border-b ${i % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}
@@ -93,8 +94,8 @@ export default function Page() {
                 </tr>
               </thead>
               <tbody>
-                {!!unit?.length &&
-                  unit.map((unit: any, i: any) => (
+                {!!unit?.data?.length &&
+                  unit?.data?.map((unit: any, i: any) => (
                     <tr
                       key={i}
                       className={`border-b ${i % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}
@@ -138,8 +139,8 @@ export default function Page() {
                 </tr>
               </thead>
               <tbody>
-                {!!subunit?.length &&
-                  subunit.map((subunit: any, i: any) => (
+                {!!subunit?.data?.length &&
+                  subunit?.data?.map((subunit: any, i: any) => (
                     <tr
                       key={i}
                       className={`border-b ${i % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}

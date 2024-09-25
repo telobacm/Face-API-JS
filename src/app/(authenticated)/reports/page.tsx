@@ -70,6 +70,8 @@ export default function Reports() {
     sort: '-timestamp',
   })
 
+console.log('page',filtered.page);
+
   useEffect(() => {
     let newFilter: any = { ...filtered }
     newFilter.filter.search = searchValue
@@ -153,7 +155,7 @@ export default function Reports() {
   }
 
   const {
-    data: tableData,
+    data: reportList,
     isLoading: isLoadingReports,
     isFetching: isFetchingReports,
     isSuccess,
@@ -277,10 +279,11 @@ export default function Reports() {
     }
   }
 
-  const showNotFound = isSuccess && !tableData?.length
+  const showNotFound = isSuccess && !reportList?.length
   const isLoading = isLoadingReports || isLoadingKampus || isLoadingUnits
   const loading =
     isLoading || isFetchingReports || isFetchingKampus || isFetchingUnits
+    const isFetching =isFetchingReports || isFetchingKampus || isFetchingUnits
 
   if (isLoading) {
     return <Loading />
@@ -314,8 +317,8 @@ export default function Reports() {
                       >
                         Pilih Kampus
                       </option>
-                      {!!kampus?.length &&
-                        kampus?.map((x: any, i: number) => (
+                      {!!kampus?.data?.length &&
+                        kampus?.data?.map((x: any, i: number) => (
                           <option key={i} value={x?.id}>
                             {x?.name}
                           </option>
@@ -343,8 +346,8 @@ export default function Reports() {
                       >
                         Pilih Unit
                       </option>
-                      {!!units?.length &&
-                        units?.map((x: any, i: number) => (
+                      {!!units?.data?.length &&
+                        units?.data?.map((x: any, i: number) => (
                           <option key={i} value={x.id + '/' + x.name}>
                             {x?.name}
                           </option>
@@ -455,7 +458,7 @@ export default function Reports() {
             </div>
           </div>
           <div className="flex-none">
-            {!!tableData ? (
+            {!!reportList ? (
               <PieChart counted="ekspresi" label="Chart Ekspresi" />
             ) : (
               ''
@@ -467,8 +470,9 @@ export default function Reports() {
           columns={columnDefWithCheckBox()}
           searchValueProps={[searchValue, setSearchValue]}
           currentPageProps={[page, setPage]}
-          title={'by user name or nip'}
-          data={tableData}
+          title={'Reports'}
+          searchby={'report by user name or nip'}
+          data={reportList}
           showNotFound={showNotFound}
           showSearchBar={true}
         />

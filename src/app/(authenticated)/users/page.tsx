@@ -10,7 +10,6 @@ import { useSession } from 'next-auth/react'
 import { toast } from 'react-toastify'
 import { BiSolidPencil } from 'react-icons/bi'
 import Link from 'next/link'
-import { isFloat64Array } from 'util/types'
 
 export default function Users(session: any) {
   const router = useRouter()
@@ -47,6 +46,8 @@ export default function Users(session: any) {
       isDeleted: false,
     },
   }
+
+console.log('page',filtered.page);
 
   const {
     data: userList,
@@ -147,7 +148,8 @@ export default function Users(session: any) {
           columns={columnDefWithCheckBox()}
           searchValueProps={[searchValue, setSearchValue]}
           currentPageProps={[page, setPage]}
-          title={'user by name or nip'}
+          title={'Users'}
+          searchby={'user by name or nip'}
           data={userList}
           showNotFound={showNotFound}
           showSearchBar={true}

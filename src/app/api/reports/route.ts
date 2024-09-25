@@ -47,7 +47,8 @@ export const GET = async (req: NextRequest, P: any) => {
 
     return LIST(req, { ...P, ...params })
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    // return NextResponse.json({ error: error.message }, { status: 500 })
+    return HandleError(error)
   }
 }
 

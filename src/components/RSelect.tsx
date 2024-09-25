@@ -15,9 +15,7 @@ const DropdownIndicator = (props: any) => {
   return (
     <components.DropdownIndicator {...props}>
       <BiChevronDown
-        className={`${
-          props?.className?.includes('header') ? 'stroke-white' : 'stroke-black'
-        } w-[10px] h-[5px] `}
+        className={``}
       />
     </components.DropdownIndicator>
   )
@@ -93,13 +91,14 @@ const RSelect = ({
   outline,
   height,
   bgCustom,
+  totalItems,
   ...props
 }: any) => {
   const customStyles = {
     control: (styles: any, { isDisabled }: any) => {
       return {
         ...styles,
-        borderColor: outline ? '#9480E0' : '#FFF',
+        borderColor: outline ? '#8c8e91' : '#FFF',
         backgroundColor: bgCustom || '#FFF',
       }
     },
@@ -118,10 +117,10 @@ const RSelect = ({
   }
 
   return (
-    <div className={`${float ? 'relative' : 'space-y-1'} ${className} `}>
+    <div className={`${float ? 'relative' : 'space-y-1'} ${className} flex items-center gap-2`}>
       {!!label && (
         <label
-          className={`${labelClass} ${float ? 'text-gray-400 text-xs bg-white absolute -top-2 left-2 z-[60]' : 'text-black'} font-semibold capitalize `}
+          className={`${labelClass} ${float ? 'text-gray-400 text-xs bg-white absolute -top-2 left-2 z-[60]' : 'text-black'} font-normal capitalize `}
         >
           {props.required ? <span className="mx-1 text-red-500">*</span> : null}
           {label}
@@ -158,6 +157,9 @@ const RSelect = ({
           {...props}
         />
       )}
+        <label>
+          dari {totalItems}
+        </label>
     </div>
   )
 }

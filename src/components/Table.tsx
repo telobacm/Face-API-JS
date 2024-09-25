@@ -54,6 +54,7 @@ const Table = <TData,>({
   columns,
   data,
   title,
+  searchby,
   onResetFilter,
   hidePagination,
   manualSorting,
@@ -119,7 +120,7 @@ const Table = <TData,>({
                   setSearchValue(e.target.value),
                 700,
               )}
-              placeholder={`Search ${title}`}
+              placeholder={`Search ${searchby}`}
               className="bg-gray-100 w-1/2 h-min border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-violet-400 focus:border-violet-400 block  p-2 "
             />
             {!!loading && <Loading fullscreen={false}></Loading>}

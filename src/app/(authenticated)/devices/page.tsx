@@ -176,7 +176,8 @@ export default function Devices() {
           columns={columnDefWithCheckBox()}
           searchValueProps={[searchValue, setSearchValue]}
           currentPageProps={[page, setPage]}
-          title={'device by kampus or unit'}
+          title={'Devices'}
+          searchby={'device by kampus or unit'}
           data={devices}
           showNotFound={showNotFound}
           showSearchBar={true}
