@@ -164,7 +164,7 @@ console.log('page',filtered.page);
     {
       accessorKey: 'no',
       header: 'No.',
-      cell: ({ row }: any) => <span>{row?.index + 1}</span>,
+      cell: ({ row }: any) => <span>{((page?.current - 1) * page?.take)+(row?.index + 1)}</span>,
     },
     {
       accessorKey: 'user.name',

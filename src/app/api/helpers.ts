@@ -50,39 +50,39 @@ export const countEnterPunctuality = (
     shift3Exit.setMinutes(0)
     shift3Exit.setSeconds(0)
     if (dayjs(body.timestamp) <= dayjs(shift1Entry)) {
-      console.log('if satpam 1')
+      // console.log('if satpam 1')
       data.isPunctual = 'Tepat Waktu'
       data.shiftSatpam = 'Shift Pagi'
     } else if (
       dayjs(body.timestamp) > dayjs(shift1Entry) &&
       dayjs(body.timestamp) < dayjs(shift1Exit)
     ) {
-      console.log('if satpam 2')
+      // console.log('if satpam 2')
       data.isPunctual = 'Terlambat'
       data.shiftSatpam = 'Shift Pagi'
     } else if (
       dayjs(body.timestamp) > dayjs(shift1Exit) &&
       dayjs(body.timestamp) <= dayjs(shift2Entry)
     ) {
-      console.log('if satpam 3')
+      // console.log('if satpam 3')
       data.isPunctual = 'Tepat Waktu'
       data.shiftSatpam = 'Shift Sore'
     } else if (
       dayjs(body.timestamp) > dayjs(shift2Entry) &&
       dayjs(body.timestamp) < dayjs(shift2Exit)
     ) {
-      console.log('if satpam 4')
+      // console.log('if satpam 4')
       data.isPunctual = 'Terlambat'
       data.shiftSatpam = 'Shift Sore'
     } else if (
       dayjs(body.timestamp) > dayjs(shift2Exit) &&
       dayjs(body.timestamp) <= dayjs(shift3Entry)
     ) {
-      console.log('if satpam 5')
+      // console.log('if satpam 5')
       data.isPunctual = 'Tepat Waktu'
       data.shiftSatpam = 'Shift Malam'
     } else if (dayjs(body.timestamp) > dayjs(shift3Entry)) {
-      console.log('if satpam 6')
+      // console.log('if satpam 6')
       data.isPunctual = 'Terlambat'
       data.shiftSatpam = 'Shift Malam'
     }

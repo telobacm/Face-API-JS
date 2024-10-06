@@ -136,9 +136,6 @@ export const LIST = async (
       ...query
     }: any = QParams || qs.parse(url);
 
-    // Logging to see if 'take' is correctly passed
-    console.log('take:', take);
-
     const params: any = {
       where: where.AND
         ? { AND: [where.AND, parseFilter(query.filter)] }

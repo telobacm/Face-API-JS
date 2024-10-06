@@ -35,10 +35,6 @@ export default function AddDevice({ prop }: any) {
     }
   }
 
-console.log('kampus', kampus);
-console.log('kampus', kampus?.data[0]);
-
-
   const isLoading = isLoadingKampus && isLoadingUnits
   if (isLoading) {
     return <Loading />

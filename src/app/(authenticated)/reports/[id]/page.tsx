@@ -49,7 +49,7 @@ export default function UserReport(props: any) {
     {
       accessorKey: 'number',
       header: 'No.',
-      cell: ({ row }: any) => <span>{row?.index + 1}</span>,
+      cell: ({ row }: any) => <span>{((page?.current - 1) * page?.take)+(row?.index + 1)}</span>,
     },
     {
       accessorKey: 'timestamp-date',

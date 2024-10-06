@@ -45,7 +45,7 @@ const Login = ({ session }: any) => {
         router.push('/settings')
       } else {
         toast.error('Incorrect Email or Password!')
-        console.log(res)
+        // console.log(res)
       }
     } catch (error) {
       console.error(error)

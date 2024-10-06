@@ -47,7 +47,7 @@ const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <div className={`relative flex justify-between items-center gap-10 py-2 px-4`}>
-      <RSelect
+      {/* <RSelect
         inputClassName="!h-11 !z-50"
         className="!z-50"
         placeholder="Show items"
@@ -58,7 +58,8 @@ const Pagination: React.FC<PaginationProps> = ({
         totalItems={totalItems}
         outline={true}
         creatable={false}
-      />
+      /> */}
+      <div className='text-sm'>Total Item <span className='font-semibold'>{totalItems}</span></div>
       {!!loading && <Loading fullscreen={false}></Loading>}
       <ReactPaginate
         className={`flex items-center ${
@@ -69,7 +70,6 @@ const Pagination: React.FC<PaginationProps> = ({
         pageRangeDisplayed={2}
         marginPagesDisplayed={1}
         onPageChange={({ selected }) => onPageChange(selected)}
-        // onPageChange={({ selected }) => console.log(selected)}
         containerClassName="pagination"
         activeClassName="active"
         previousLabel=<BiChevronLeft/>

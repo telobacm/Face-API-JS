@@ -175,10 +175,13 @@ const Table = <TData,>({
               })}
             </thead>
             {!!data?.data?.length && (
-              <tbody className="bg-white divide-y divide-gray-200">
-                {tableInstance.getRowModel().rows.map((rowEl) => {
+              <tbody className="bg-white divide-y divide-gray-300">
+                {tableInstance.getRowModel().rows.map((rowEl, rowIndex) => {
                   return (
-                    <tr key={rowEl.id} className="hover:bg-gray-100">
+                    <tr key={rowEl.id} 
+                    className='hover:bg-gray-100'
+                    // className={`${rowIndex % 2 === 1 ? 'bg-slate-50' : 'bg-white'} hover:bg-gray-100`}
+                      >
                       {rowEl.getVisibleCells().map((cellEl) => {
                         return (
                           <td key={cellEl.id} className="text-gray-900 p-4">
