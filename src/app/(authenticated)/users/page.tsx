@@ -4,7 +4,6 @@ import { defaultPage } from '~/components/Pagination'
 import Table from '../../../components/Table'
 import { useGetList } from '~/services/dashboard'
 import AdminLayout from '../components/layoutAdmin'
-import Loading from '~/components/loading'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { toast } from 'react-toastify'
@@ -40,6 +39,7 @@ export default function Users(session: any) {
   const search_keys = 'name,nip'
   const filtered: any = {
     page: page.current,
+    take: page.take,
     filter: {
       search: searchValue,
       search_keys: search_keys,
@@ -47,7 +47,7 @@ export default function Users(session: any) {
     },
   }
 
-console.log('page',filtered.page);
+console.log('state page',page);
 
   const {
     data: userList,
@@ -60,7 +60,7 @@ console.log('page',filtered.page);
     {
       accessorKey: 'no',
       header: 'No.',
-      cell: ({ row }: any) => <span>{row?.index + 1}</span>,
+      cell: ({ row }: any) => <span>{((page?.current - 1) * page?.take)+(row?.index + 1)}</span>,
     },
     {
       accessorKey: 'name',
@@ -135,11 +135,11 @@ console.log('page',filtered.page);
     }
   }
 
-  const showNotFound = isSuccess && !userList?.length
+  const showNotFound = isSuccess && !userList?.data?.length
 
-  if (isLoading) {
-    return <Loading />
-  }
+  console.log('leng',userList?.data?.length);
+  
+
   return (
     status == 'authenticated' && (
       <AdminLayout sidebar={true} header={true}>

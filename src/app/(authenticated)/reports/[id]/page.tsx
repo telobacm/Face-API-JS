@@ -104,7 +104,7 @@ export default function UserReport(props: any) {
     },
   ]
 
-  const showNotFound = isSuccessReports && !reports?.length
+  const showNotFound = isSuccessReports && !reports?.data?.length
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -112,9 +112,6 @@ export default function UserReport(props: any) {
     }
   }, [status, router, role])
 
-  if (isLoadingUser || isLoadingReports) {
-    return <Loading />
-  }
   return (
     status == 'authenticated' && (
       <AdminLayout sidebar={true} header={true}>

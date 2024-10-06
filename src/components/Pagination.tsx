@@ -38,7 +38,7 @@ const Pagination: React.FC<PaginationProps> = ({
 
   const onLimitChange = useCallback(
     (value: number) => setPage({ current: 1, take: value }),
-    [setPage],
+    [page, setPage],
   )
 
   const itemsPerPage = page.take
@@ -53,7 +53,7 @@ const Pagination: React.FC<PaginationProps> = ({
         placeholder="Show items"
         options={limitOptions}
         value={limitOptions.find((x) => x.value == itemsPerPage)}
-        onChange={({ value }: any) => onLimitChange(value)}
+        onChange={({ value }:any) => onLimitChange(value)}
         label={'menampilkan'}
         totalItems={totalItems}
         outline={true}
@@ -69,6 +69,7 @@ const Pagination: React.FC<PaginationProps> = ({
         pageRangeDisplayed={2}
         marginPagesDisplayed={1}
         onPageChange={({ selected }) => onPageChange(selected)}
+        // onPageChange={({ selected }) => console.log(selected)}
         containerClassName="pagination"
         activeClassName="active"
         previousLabel=<BiChevronLeft/>

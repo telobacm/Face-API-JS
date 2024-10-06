@@ -4,7 +4,6 @@ import { defaultPage } from '~/components/Pagination'
 import Table from '../../../components/Table'
 import { useGetList } from '~/services/dashboard'
 import AdminLayout from '../components/layoutAdmin'
-import Loading from '~/components/loading'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import PieChart from '../components/PieChart'
@@ -52,8 +51,9 @@ export default function Reports() {
   const [searchValue, setSearchValue] = useState('')
   const [page, setPage] = useState(defaultPage)
   const search_keys = 'user.name,user.nip'
-  const [filtered, SetFiltered] = useState({
+  let filtered:any = {
     page: page.current,
+    take: page.take,
     filter: {
       search: searchValue,
       search_keys: search_keys,
@@ -68,14 +68,14 @@ export default function Reports() {
       },
     },
     sort: '-timestamp',
-  })
+  }
 
 console.log('page',filtered.page);
 
   useEffect(() => {
     let newFilter: any = { ...filtered }
     newFilter.filter.search = searchValue
-    SetFiltered(newFilter)
+    filtered = newFilter
   }, [searchValue])
 
   const handleFilterTypeChange = (e: any) => setFilterType(e.target.value)
@@ -123,7 +123,7 @@ console.log('page',filtered.page);
         user: { unitId: parseInt(filterUnit) },
       }
     }
-    SetFiltered(newFilter)
+    filtered = newFilter
   }
 
   const handleClearFilters = () => {
@@ -151,7 +151,7 @@ console.log('page',filtered.page);
       },
       sort: '-timestamp',
     }
-    SetFiltered(initialFilter)
+    filtered = initialFilter
   }
 
   const {
@@ -279,15 +279,11 @@ console.log('page',filtered.page);
     }
   }
 
-  const showNotFound = isSuccess && !reportList?.length
+  const showNotFound = isSuccess && !reportList?.data?.length
   const isLoading = isLoadingReports || isLoadingKampus || isLoadingUnits
-  const loading =
-    isLoading || isFetchingReports || isFetchingKampus || isFetchingUnits
-    const isFetching =isFetchingReports || isFetchingKampus || isFetchingUnits
+  const loading = isLoading || isFetchingReports || isFetchingKampus || isFetchingUnits
+  const isFetching =isFetchingReports || isFetchingKampus || isFetchingUnits
 
-  if (isLoading) {
-    return <Loading />
-  }
   return (
     status == 'authenticated' && (
       <AdminLayout sidebar={true} header={true}>

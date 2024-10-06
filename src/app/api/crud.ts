@@ -50,6 +50,71 @@ function completeParams({
   }
 }
 
+// export const LIST = async (
+//   req: NextRequest,
+//   {
+//     include,
+//     where = {},
+//     select = {},
+//     withoutLimitPagination = false,
+//     returnValue,
+//     QParams,
+//   }: args,
+// ): Promise<any> => {
+//   try {
+//     const table = req.nextUrl.pathname.split('/')[2]
+//     const url = new URL(req.url).search.substring(1)
+//     const {
+//       page,
+//       take,
+//       include: QInclude,
+//       ...query
+//     }: any = QParams || qs.parse(url)
+//     const params: any = {
+//       // where: { ...parseFilter(filter), ...where },
+//       where: where.AND
+//         ? { AND: [where.AND, parseFilter(query.filter)] }
+//         : mergeObjects(parseFilter(query.filter), where),
+//     }
+
+//     if (!withoutLimitPagination || (page && take)) {
+//       params.skip = (parseInt(page || 1) - 1) * parseInt(take || 10)
+//       params.take = parseInt(take || 10)
+//     }
+
+//     completeParams({
+//       params,
+//       select,
+//       include: include || parseInclude(QInclude),
+//     })
+//     sortingDataWithParams(query.sort, params)
+//     console.log('[PARAMS]:')
+//     console.dir(params, { depth: 10 })
+//     const [data, count] = await Promise.all([
+//       prisma[table].findMany(params),
+//       prisma[table].count({ where: params.where }),
+//     ])
+//     const result = {
+//       data,
+//       meta: {
+//         count,
+//         take: take || (withoutLimitPagination ? count : 10),
+//         page: page || 1,
+//         // pageCount: Math.ceil(
+//         //   count / (page || (withoutLimitPagination ? count : 10)),
+//         // ),
+//         pageCount: Math.ceil(count / (take || 10)),  // Use 'take' here for pageCount calculation
+//       },
+//     }
+//     if (returnValue) {
+//       return result
+//     }
+//     return NextResponse.json(result)
+//   } catch (error) {
+//     return handleError(error)
+//   }
+// }
+
 export const LIST = async (
   req: NextRequest,
   {
@@ -62,57 +127,65 @@ export const LIST = async (
   }: args,
 ): Promise<any> => {
   try {
-    const table = req.nextUrl.pathname.split('/')[2]
-    const url = new URL(req.url).search.substring(1)
+    const table = req.nextUrl.pathname.split('/')[2];
+    const url = new URL(req.url).search.substring(1);
     const {
       page,
       take,
       include: QInclude,
       ...query
-    }: any = QParams || qs.parse(url)
+    }: any = QParams || qs.parse(url);
+
+    // Logging to see if 'take' is correctly passed
+    console.log('take:', take);
+
     const params: any = {
-      // where: { ...parseFilter(filter), ...where },
       where: where.AND
         ? { AND: [where.AND, parseFilter(query.filter)] }
         : mergeObjects(parseFilter(query.filter), where),
-    }
+    };
 
     if (!withoutLimitPagination || (page && take)) {
-      params.skip = (parseInt(page || 1) - 1) * parseInt(take || 10)
-      params.take = parseInt(take || 10)
+      params.skip = (parseInt(page || 1) - 1) * parseInt(take || 10);
+      params.take = parseInt(take || 10);
     }
 
     completeParams({
       params,
       select,
       include: include || parseInclude(QInclude),
-    })
-    sortingDataWithParams(query.sort, params)
-    console.log('[PARAMS]:')
-    console.dir(params, { depth: 10 })
+    });
+
+    sortingDataWithParams(query.sort, params);
+
+    console.log('[PARAMS]:');
+    console.dir(params, { depth: 10 });  // Log params to ensure 'take' is applied
+
     const [data, count] = await Promise.all([
       prisma[table].findMany(params),
       prisma[table].count({ where: params.where }),
-    ])
+    ]);
+
     const result = {
       data,
       meta: {
         count,
         take: take || (withoutLimitPagination ? count : 10),
         page: page || 1,
-        pageCount: Math.ceil(
-          count / (page || (withoutLimitPagination ? count : 10)),
-        ),
+        pageCount: Math.ceil(count / (take || 10)),
       },
-    }
+    };
+
     if (returnValue) {
-      return result
+      return result;
     }
-    return NextResponse.json(result)
+
+    return NextResponse.json(result);
   } catch (error) {
-    return handleError(error)
+    return handleError(error);
   }
-}
+};
+
 
 export const DETAIL = async (req: NextRequest, { params, where }: any) => {
   try {

@@ -66,7 +66,6 @@ const Table = <TData,>({
   const [page, setPage] = currentPageProps
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [sorting, setSorting] = useState<SortingState>([])
-  const itemsPerPage = 10
 
   const tableInstance = useReactTable<TData>({
     columns,
@@ -81,7 +80,7 @@ const Table = <TData,>({
     },
     initialState: {
       pagination: {
-        pageSize: itemsPerPage,
+        pageSize: page.take || 10,
       },
     },
     onSortingChange: setSorting,
@@ -111,7 +110,7 @@ const Table = <TData,>({
           <div
             className={`w-[60%] ${isOption ? 'grid md:flex items-end gap-2 ' : ''}`}
           >
-            <input
+            {!!searchby && <input
               name="search"
               type="search"
               defaultValue={searchValue}
@@ -122,84 +121,10 @@ const Table = <TData,>({
               )}
               placeholder={`Search ${searchby}`}
               className="bg-gray-100 w-1/2 h-min border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-violet-400 focus:border-violet-400 block  p-2 "
-            />
+            />}
             {!!loading && <Loading fullscreen={false}></Loading>}
-            {/* 
-            {options && (
-              <RSelect
-                options={options}
-                label={`Category Filter`}
-                name="categories"
-                onChange={(e: Option) => setCategory(e.value)}
-                value={options?.find((v: Option) => v.value === category) || ''}
-                outline
-                className="!w-full"
-                inputClassName="!h-auto"
-              />
-            )}
-            {onResetFilter && category && (
-              <div>
-                <Button
-                  className="w-max"
-                  variant="danger"
-                  onClick={onResetFilter}
-                >
-                  Reset Filters
-                </Button>
-              </div>
-            )} */}
           </div>
           <div className="flex gap-2">
-            {/* {handleImport && (
-              <>
-                {loadingImport ? (
-                  <Loading fullscreen={false} />
-                ) : (
-                  <div className="grid">
-                    <div className="relative cursor-pointer">
-                      <label
-                        htmlFor={'import-file'}
-                        className="w-full h-full cursor-pointer"
-                      >
-                        <Button
-                          withoutlineclamp="true"
-                          className="!leading-normal !h-10"
-                          icon={
-                            <svg
-                              stroke="currentColor"
-                              fill="currentColor"
-                              strokeWidth="0"
-                              viewBox="0 0 24 24"
-                              height="200px"
-                              width="200px"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path fill="none" d="M0 0h24v24H0z"></path>
-                              <path d="M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5-5 5z"></path>
-                            </svg>
-                          }
-                          variant="violet"
-                          disabled={loadingImport}
-                        >
-                          Import File
-                        </Button>
-                      </label>
-                      <input
-                        {...props}
-                        name={'import'}
-                        id="import-file"
-                        type="file"
-                        accept=".xlsx,.csv"
-                        onChange={handleImport}
-                        className={`current absolute !z-[60] cursor-pointer top-0 p-0 opacity-0 outline-none  w-full h-full`}
-                      />
-                    </div>
-                    <p className="mt-1 text-xs text-gray-500 ">XLSX / CSV</p>
-                  </div>
-                )}
-              </>
-            )} */}
-
             {handleAdd && (
               <Button
                 onClick={handleAdd}

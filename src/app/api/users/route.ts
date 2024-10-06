@@ -60,13 +60,14 @@ export const GET = async (req: NextRequest, P: any) => {
 
     const table = req.nextUrl.pathname.split('/')[2]
     const url = new URL(req.url).search.substring(1)
-    const { sort, part, limit, include = {} }: any = qs.parse(url)
+    const { sort, part, limit, include = {} }: any = qs.parse(url);
 
     const where = {}
 
     // Include related entities
     const params: any = {
       where,
+      take: parseInt(limit),
       include: {
         kampus: {
           select: {

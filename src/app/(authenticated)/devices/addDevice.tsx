@@ -35,6 +35,10 @@ export default function AddDevice({ prop }: any) {
     }
   }
 
+console.log('kampus', kampus);
+console.log('kampus', kampus?.data[0]);
+
+
   const isLoading = isLoadingKampus && isLoadingUnits
   if (isLoading) {
     return <Loading />
@@ -60,8 +64,8 @@ export default function AddDevice({ prop }: any) {
             <option value="" disabled selected hidden className="text-gray-400">
               Pilih Kampus
             </option>
-            {!!kampus?.length &&
-              kampus?.map((x: any, i: number) => (
+            {!!kampus?.data?.length &&
+                  kampus?.data?.map((x: any, i: number) => (
                 <option key={i} value={x?.id}>
                   {x?.name}
                 </option>
@@ -80,8 +84,8 @@ export default function AddDevice({ prop }: any) {
             <option value="" disabled selected hidden className="text-gray-400">
               Pilih Unit
             </option>
-            {!!units?.length &&
-              units?.map((x: any, i: number) => (
+            {!!units?.data?.length &&
+                  units?.data?.map((x: any, i: number) => (
                 <option key={i} value={x.id + '/' + x.name}>
                   {x?.name}
                 </option>

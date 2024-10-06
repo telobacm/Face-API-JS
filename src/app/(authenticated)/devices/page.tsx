@@ -4,7 +4,6 @@ import { defaultPage } from '~/components/Pagination'
 import Table from '../../../components/Table'
 import { useGetList } from '~/services/dashboard'
 import AdminLayout from '../components/layoutAdmin'
-import Loading from '~/components/loading'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import DeleteItem from '../components/deleteItem'
@@ -19,6 +18,7 @@ export default function Devices() {
   const search_keys = 'kampus.name,unit.name'
   const filtered: any = {
     page: page.current,
+    take: page.take,
     filter: {
       search: searchValue,
       search_keys: search_keys,
@@ -107,7 +107,7 @@ export default function Devices() {
     },
   ]
 
-  const showNotFound = isSuccess && !devices?.length
+  const showNotFound = isSuccess && !devices?.data?.length
 
   const router = useRouter()
   const { status, data }: any = useSession()
@@ -118,9 +118,6 @@ export default function Devices() {
       router.push('/settings')
   }, [status, router, role])
 
-  if (isLoading || isLoadingAddress) {
-    return <Loading />
-  }
   return (
     status == 'authenticated' && (
       <AdminLayout sidebar={true} header={true}>
