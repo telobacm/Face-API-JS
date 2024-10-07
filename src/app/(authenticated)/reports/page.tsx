@@ -70,8 +70,6 @@ export default function Reports() {
     sort: '-timestamp',
   }
 
-console.log('page',filtered.page);
-
   useEffect(() => {
     let newFilter: any = { ...filtered }
     newFilter.filter.search = searchValue

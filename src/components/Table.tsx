@@ -11,9 +11,6 @@ import {
 } from '@tanstack/react-table'
 import debounce from 'debounce'
 import Button from './button'
-
-import RSelect from './RSelect'
-
 import Loading from './loading'
 import Pagination, { Page, SetPage } from './Pagination'
 import { listResult } from '~/services/type'
@@ -66,23 +63,24 @@ const Table = <TData,>({
   const [page, setPage] = currentPageProps
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [sorting, setSorting] = useState<SortingState>([])
+  const [tableData, setTableData] = useState<TData[]>(data?.data || []);
 
   const tableInstance = useReactTable<TData>({
     columns,
-    data: data?.data || [],
+    data: tableData,
     manualSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     state: {
       rowSelection: rowSelection,
       sorting: sorting,
     },
-    initialState: {
-      pagination: {
-        pageSize: page.take || 10,
-      },
-    },
+    // initialState: {
+    //   pagination: {
+    //     pageSize: page.take || 10,
+    //   },
+    // },
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
     enableRowSelection: true,
@@ -94,6 +92,10 @@ const Table = <TData,>({
     }
     // eslint-disable-next-line
   }, [searchValue])
+
+  useEffect(() => {
+    setTableData(data?.data || []);
+}, [data?.data]);
 
   const isOption = !!options
   const totalItems = data?.meta?.count || 0

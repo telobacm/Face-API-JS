@@ -47,8 +47,6 @@ export default function Users(session: any) {
     },
   }
 
-console.log('state page',page);
-
   const {
     data: userList,
     isLoading,
@@ -136,9 +134,6 @@ console.log('state page',page);
   }
 
   const showNotFound = isSuccess && !userList?.data?.length
-
-  console.log('leng',userList?.data?.length);
-  
 
   return (
     status == 'authenticated' && (

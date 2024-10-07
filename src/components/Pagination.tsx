@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback } from 'react'
 import ReactPaginate from 'react-paginate'
 import RSelect from './RSelect'
 import Loading from './loading'
@@ -47,9 +47,10 @@ const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <div className={`relative flex justify-between items-center gap-10 py-2 px-4`}>
-      {/* <RSelect
-        inputClassName="!h-11 !z-50"
-        className="!z-50"
+      <div className='text-sm'>total item: <span className='font-semibold'>{totalItems}</span></div>
+      <RSelect
+        inputClassName="!h-11 !z-50 text-sm"
+        className="!z-50 text-sm"
         placeholder="Show items"
         options={limitOptions}
         value={limitOptions.find((x) => x.value == itemsPerPage)}
@@ -58,13 +59,10 @@ const Pagination: React.FC<PaginationProps> = ({
         totalItems={totalItems}
         outline={true}
         creatable={false}
-      /> */}
-      <div className='text-sm'>Total Item <span className='font-semibold'>{totalItems}</span></div>
+      />
       {!!loading && <Loading fullscreen={false}></Loading>}
-      <ReactPaginate
-        className={`flex items-center ${
-          totalItems <= itemsPerPage ? 'hidden' : ' '
-        }`}
+      {totalItems >= itemsPerPage ? (<ReactPaginate
+        className='flex items-center'
         initialPage={currentPage}
         pageCount={pageCount}
         pageRangeDisplayed={2}
@@ -85,7 +83,7 @@ const Pagination: React.FC<PaginationProps> = ({
           currentPage >= pageCount - 1 ? 'text-gray-300 cursor-not-allowed' : ''
         }`}
         activeLinkClassName="bg-blue-500 text-white"
-      />
+      />): <span className='w-48'/>}
     </div>
   )
 }

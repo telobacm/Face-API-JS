@@ -1,6 +1,5 @@
 import Select, { components } from 'react-select'
 import CreatableSelect from 'react-select/creatable'
-// import Chevrondown from './icons/Chevrondown';
 import { BiChevronDown } from 'react-icons/bi'
 
 const CustomIcon = ({ active, disabled }: any) => {
@@ -120,7 +119,7 @@ const RSelect = ({
     <div className={`${float ? 'relative' : 'space-y-1'} ${className} flex items-center gap-2`}>
       {!!label && (
         <label
-          className={`${labelClass} ${float ? 'text-gray-400 text-xs bg-white absolute -top-2 left-2 z-[60]' : 'text-black'} font-normal capitalize `}
+          className={`${labelClass} ${float ? 'text-gray-400 text-xs bg-white absolute -top-2 left-2 z-[60]' : 'text-black'} font-normal `}
         >
           {props.required ? <span className="mx-1 text-red-500">*</span> : null}
           {label}
@@ -158,7 +157,7 @@ const RSelect = ({
         />
       )}
         <label>
-          dari {totalItems}
+          per halaman
         </label>
     </div>
   )
