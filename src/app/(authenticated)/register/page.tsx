@@ -259,8 +259,8 @@ const Register = () => {
                           >
                             Pilih Kampus
                           </option>
-                          {!!kampus?.length &&
-                            kampus?.map((x: any, i: number) => (
+                          {!!kampus?.data?.length &&
+                            kampus?.data?.map((x: any, i: number) => (
                               <option key={i} value={x?.id}>
                                 {x?.name}
                               </option>
@@ -294,8 +294,8 @@ const Register = () => {
                           >
                             Pilih Unit
                           </option>
-                          {!!units?.length &&
-                            units?.map((x: any, i: number) => (
+                          {!!units?.data?.length &&
+                            units?.data?.map((x: any, i: number) => (
                               <option key={i} value={x.id + '/' + x.name}>
                                 {x?.name}
                               </option>
@@ -330,8 +330,8 @@ const Register = () => {
                           >
                             Pilih Sub Unit
                           </option>
-                          {!!subUnitOptions?.length &&
-                            subUnitOptions?.map((x: any, i: number) => (
+                          {!!subUnitOptions?.data?.length &&
+                            subUnitOptions?.data?.map((x: any, i: number) => (
                               <option key={i} value={x?.id}>
                                 {x?.name}
                               </option>
