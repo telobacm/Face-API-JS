@@ -44,6 +44,16 @@ export const GET = async (req: NextRequest, P: any) => {
         },
       }
     }
+// Include kampus and unit in the query
+params.include = {
+  user: {
+    include: {
+      kampus: true, // Ensure kampus relation is included
+      unit: true,   // Ensure unit relation is included
+      subunit: true,
+    },
+  },
+};
 
     return LIST(req, { ...P, ...params })
   } catch (error: any) {

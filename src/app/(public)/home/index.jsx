@@ -317,6 +317,9 @@ function Root() {
         // COCOKKAN NIP DARI FACE DESCRIPTOR DENGAN USER TERDAFTAR DI DATABASE
         const userData = await users.data.find((u) => u.nip === nip)
         await setUser(() => userData)
+        // TAMPILKAN USER YANG TERDETEKSI DI CONSOLE
+        console.log('user terdeteksi', userData);
+        
 
         // AMBIL EKSPRESI PALING DOMINAN
         let obj = detections.expressions
